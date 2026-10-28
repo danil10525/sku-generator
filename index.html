@@ -4,77 +4,18 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Генератор артикулов</title>
-<style>
-  :root {
-    --bg: #0f1115; --panel: #171a21; --line: #262b36;
-    --text: #e6e9ef; --muted: #9aa4b2; --accent: #4f8cff;
-    --ok: #35c07a; --warn: #e0a63a; --err: #e05656;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; padding: 24px; background: var(--bg); color: var(--text);
-    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  }
-  h1 { font-size: 20px; margin: 0 0 4px; }
-  .sub { color: var(--muted); margin-bottom: 20px; }
-  .wrap { max-width: 1080px; margin: 0 auto; }
-  
-  /* Главные вкладки */
-  .main-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
-  .main-tab {
-    padding: 10px 20px; border: 1px solid var(--line); background: var(--panel);
-    color: var(--muted); border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 15px;
-  }
-  .main-tab.active { color: #fff; border-color: var(--accent); background: #1d2230; }
-  
-  /* Внутренние вкладки (для других брендов) */
-  .sub-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-  .sub-tab {
-    padding: 6px 12px; border: 1px solid var(--line); background: var(--panel);
-    color: var(--muted); border-radius: 6px; cursor: pointer; font-size: 13px;
-  }
-  .sub-tab.active { color: var(--text); border-color: var(--accent); }
-
-  .panel {
-    background: var(--panel); border: 1px solid var(--line);
-    border-radius: 12px; padding: 16px; margin-bottom: 16px;
-  }
-  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-  .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-  .grid-6 { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
-  
-  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-  input, select {
-    width: 100%; padding: 8px 10px; background: #0f1219; color: var(--text);
-    border: 1px solid var(--line); border-radius: 8px; font: inherit;
-  }
-  input:focus, select:focus { outline: none; border-color: var(--accent); }
-  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
-  .checkbox-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-  .checkbox-row input { width: auto; }
-  button {
-    padding: 9px 14px; border-radius: 8px; border: 1px solid var(--line);
-    background: #1d2230; color: var(--text); cursor: pointer; font: inherit;
-  }
-  button:hover { border-color: var(--accent); }
-  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
-  table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
-  th { color: var(--muted); font-weight: 500; font-size: 12px; }
-  td.mono, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 15px; }
-  .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
-  .hidden { display: none !important; }
-  
-  @media (max-width: 768px) {
-    .grid, .grid-3, .grid-4, .grid-6 { grid-template-columns: 1fr; }
-  }
-</style>
+<!-- Подключаем стили -->
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <div class="wrap">
-  <h1>Генератор артикулов</h1>
-  <div class="sub">Единая система для SABER-TEX и других брендов</div>
+  <div class="header">
+    <div class="header-left">
+      <h1>Генератор артикулов</h1>
+      <p class="sub">Единая система для SABER-TEX и других брендов</p>
+    </div>
+    <button id="themeToggle" class="theme-btn" title="Переключить тему">🌚</button>
+  </div>
 
   <!-- ГЛАВНЫЕ ВКЛАДКИ -->
   <div class="main-tabs">
@@ -82,58 +23,30 @@
     <button class="main-tab" data-main="other">Другие бренды (Свободный)</button>
   </div>
 
-  <!-- ========================================== -->
   <!-- ВКЛАДКА 1: SABER-TEX -->
-  <!-- ========================================== -->
   <section id="section-saber">
     <div class="panel">
       <div class="grid-6">
-        <div>
-          <label>Тип (Тип)</label>
-          <select id="saberType"></select>
-        </div>
-        <div>
-          <label>Модель</label>
-          <select id="saberModel"></select>
-        </div>
-        <div>
-          <label>Сезон</label>
-          <select id="saberSeason"></select>
-        </div>
-        <div>
-          <label>Цвет</label>
-          <select id="saberColor"></select>
-        </div>
-        <div>
-          <label>Размер</label>
-          <select id="saberSize"></select>
-        </div>
-        <div>
-          <label>Рост</label>
-          <select id="saberHeight"></select>
-        </div>
+        <div><label>Тип</label><select id="saberType"></select></div>
+        <div><label>Модель</label><select id="saberModel"></select></div>
+        <div><label>Сезон</label><select id="saberSeason"></select></div>
+        <div><label>Цвет</label><select id="saberColor"></select></div>
+        <div><label>Размер</label><select id="saberSize"></select></div>
+        <div><label>Рост</label><select id="saberHeight"></select></div>
       </div>
-      
       <div class="row">
         <button class="primary" id="btnGenSaber">Сгенерировать артикул</button>
         <button id="btnCopySaber">Копировать</button>
       </div>
-      <div class="hint">Формат строго по регламенту: <b>Тип-Модель-Сезон-Цвет-Размер-Рост</b> (например: БР-БРК-ДС-001-4042-158). Без порядковых номеров и контрольных сумм.</div>
+      <div class="hint">Формат строго по регламенту: <b>Тип-Модель-Сезон-Цвет-Размер-Рост</b></div>
     </div>
-
     <div class="panel">
-      <div class="row" style="margin-top:0">
-        <strong>Результат</strong>
-      </div>
-      <div id="saberResult" class="mono" style="font-size: 24px; padding: 20px; background: #0f1219; border-radius: 8px; border: 1px solid var(--line); text-align: center; letter-spacing: 1px;">
-        Выберите параметры...
-      </div>
+      <div class="row" style="margin-top:0"><strong>Результат</strong></div>
+      <div id="saberResult" class="mono" style="font-size: 24px; padding: 20px; background: var(--input-bg); border-radius: 8px; border: 1px solid var(--line); text-align: center; letter-spacing: 1px;">Выберите параметры...</div>
     </div>
   </section>
 
-  <!-- ========================================== -->
   <!-- ВКЛАДКА 2: ДРУГИЕ БРЕНДЫ -->
-  <!-- ========================================== -->
   <section id="section-other" class="hidden">
     <div class="sub-tabs">
       <button class="sub-tab active" data-sub="gen">Генератор</button>
@@ -141,82 +54,41 @@
       <button class="sub-tab" data-sub="data">Данные (Счётчики)</button>
     </div>
 
-    <!-- Подвкладка: Генератор -->
     <div id="sub-gen">
       <div class="panel">
         <div class="grid-3">
-          <div>
-            <label>Префикс</label>
-            <input id="prefix" value="АРТ" maxlength="8" />
-          </div>
-          <div>
-            <label>Категория (из списка)</label>
-            <select id="categorySelect"></select>
-          </div>
-          <div>
-            <label>Бренд / Поставщик</label>
-            <input id="brand" value="НИКЕ" />
-          </div>
+          <div><label>Префикс</label><input id="prefix" value="АРТ" maxlength="8" /></div>
+          <div><label>Категория (из списка)</label><select id="categorySelect"></select></div>
+          <div><label>Бренд / Поставщик</label><input id="brand" value="НИКЕ" /></div>
         </div>
-
         <div class="checkbox-row">
           <input type="checkbox" id="useParentGroup" checked />
           <label for="useParentGroup" style="margin:0; cursor:pointer;">Включать родительскую группу в артикул (напр. ОБУВЬ-БЕРЦЫ)</label>
         </div>
-
         <div class="grid" style="margin-top:12px">
-          <div>
-            <label>Атрибуты (цвет, размер, ...)</label>
-            <input id="attrs" value="ЧЕРНЫЙ 42" placeholder="ЧЕРНЫЙ 42 / КРАСНЫЙ XL" />
-          </div>
-          <div>
-            <label>Количество</label>
-            <input id="qty" type="number" min="1" max="1000" value="5" />
-          </div>
+          <div><label>Атрибуты (цвет, размер, ...)</label><input id="attrs" value="ЧЕРНЫЙ 42" placeholder="ЧЕРНЫЙ 42 / КРАСНЫЙ XL" /></div>
+          <div><label>Количество</label><input id="qty" type="number" min="1" max="1000" value="5" /></div>
         </div>
-
         <div class="grid-3" style="margin-top:12px">
-          <div>
-            <label>Ширина номера</label>
-            <input id="seqWidth" type="number" min="1" max="10" value="5" />
-          </div>
-          <div>
-            <label>Режим счётчика</label>
-            <select id="counterMode">
-              <option value="per-combo">По комбинации</option>
-              <option value="global">Сквозной</option>
-            </select>
-          </div>
-          <div>
-            <label>Макс. длина артикула</label>
-            <input id="maxLen" type="number" min="8" max="120" value="40" />
-          </div>
+          <div><label>Ширина номера</label><input id="seqWidth" type="number" min="1" max="10" value="5" /></div>
+          <div><label>Режим счётчика</label><select id="counterMode"><option value="per-combo">По комбинации</option><option value="global">Сквозной</option></select></div>
+          <div><label>Макс. длина артикула</label><input id="maxLen" type="number" min="8" max="120" value="40" /></div>
         </div>
-
         <div class="row">
           <button class="primary" id="btnGenerate">Сгенерировать</button>
           <button id="btnCopy">Копировать</button>
           <button id="btnCsv">Скачать CSV</button>
         </div>
       </div>
-
       <div class="panel">
-        <div class="row" style="margin-top:0">
-          <strong>Результат</strong>
-          <span class="hint" id="summary"></span>
-        </div>
+        <div class="row" style="margin-top:0"><strong>Результат</strong><span class="hint" id="summary"></span></div>
         <table>
-          <thead>
-            <tr><th style="width:56px">#</th><th>Артикул</th><th style="width:90px">Длина</th></tr>
-          </thead>
-          <tbody id="resultBody">
-            <tr><td colspan="3" class="hint">Пока пусто</td></tr>
-          </tbody>
+          <thead><tr><th style="width:56px">#</th><th>Артикул</th><th style="width:90px">Длина</th></tr></thead>
+          <tbody id="resultBody"><tr><td colspan="3" class="hint">Пока пусто</td></tr></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Подвкладка: Проверка -->
     <div id="sub-val" class="hidden">
       <div class="panel">
         <label>Артикул (свободный формат)</label>
@@ -226,7 +98,6 @@
       </div>
     </div>
 
-    <!-- Подвкладка: Данные -->
     <div id="sub-data" class="hidden">
       <div class="panel">
         <strong>Счётчики свободного формата</strong>
@@ -245,405 +116,7 @@
     </div>
   </section>
 </div>
-
-<script>
-(() => {
-  "use strict";
-
-  // ==========================================
-  // ДАННЫЕ ДЛЯ SABER-TEX (ИЗ PDF)
-  // ==========================================
-  const SABER_DATA = {
-    types: [
-      { code: "БР", name: "Брюки" },
-      { code: "БРЮ", name: "Брюки (альт)" },
-      { code: "КОС", name: "Костюм" },
-      { code: "КУР", name: "Куртка" },
-      { code: "ФУТ", name: "Футболка" }
-    ],
-    models: [
-      { code: "БРК", name: "Беркут-К" },
-      { code: "ГВР", name: "Гвардия" }
-    ],
-    seasons: [
-      { code: "ЛТ", name: "Лето" },
-      { code: "ДМ", name: "Демисезонное" },
-      { code: "ЗМ", name: "Зима" },
-      { code: "ВС", name: "Внесезонное" }
-    ],
-    colors: [
-      { code: "001", name: "Черный" },
-      { code: "002", name: "Белый" },
-      { code: "003", name: "X" },
-      { code: "004", name: "X" },
-      { code: "005", name: "X" },
-      { code: "006", name: "X" }
-    ],
-    sizes: [
-      { code: "4042", name: "40-42" },
-      { code: "4446", name: "44-46" },
-      { code: "4850", name: "48-50" },
-      { code: "5254", name: "52-54" },
-      { code: "5658", name: "56-58" },
-      { code: "6062", name: "60-62" }
-    ],
-    heights: [
-      { code: "158", name: "158-164" },
-      { code: "170", name: "170-176" },
-      { code: "182", name: "182-188" }
-    ]
-  };
-
-  // ==========================================
-  // ДАННЫЕ ДЛЯ ДРУГИХ БРЕНДОВ
-  // ==========================================
-  const CATEGORY_TREE = [
-    {
-      group: "Аксессуары",
-      items: [
-        { name: "Бабочки", parent: "Галстуки" }, { name: "Готовые", parent: "Галстуки" },
-        { name: "Гюйсы", parent: "Галстуки" }, { name: "Зажимы", parent: "Галстуки" },
-        { name: "Классические", parent: "Галстуки" }, { name: "Мелочевка" },
-        { name: "Обложки" }, { name: "Сувениры" }
-      ]
-    },
-    {
-      group: "Головные уборы",
-      items: [
-        { name: "Арафатки" }, { name: "Банданы" }, { name: "Баффы" }, { name: "Береты" },
-        { name: "Кепки" }, { name: "Маски" }, { name: "Панамы" }, { name: "Пилотки" },
-        { name: "Прочее" }, { name: "Фуражки" }, { name: "Шапки" }, { name: "Шарфы" }
-      ]
-    },
-    {
-      group: "Носки",
-      items: [
-        { name: "Портянки" }, { name: "Рабочие" }, { name: "Спортивные" }, { name: "Термоноски" }, { name: "Форменные" }
-      ]
-    },
-    {
-      group: "Обувь",
-      items: [
-        { name: "Берцы" }, { name: "Ботинки" }, { name: "Кеды" }, { name: "Кроссовки" },
-        { name: "Полуботинки" }, { name: "Прочая" }, { name: "Прочее" }, { name: "Сандалии" },
-        { name: "Сапоги" }, { name: "Туфли" }, { name: "Уход" }, { name: "Шнурки" }
-      ]
-    }
-  ];
-
-  const LS_COUNTERS = "sku.counters.v1";
-  const LS_SETTINGS = "sku.settings.v1";
-
-  const state = {
-    counters: readJSON(LS_COUNTERS, {}),
-    lastBatch: []
-  };
-
-  function readJSON(key, fallback) {
-    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch (e) { return fallback; }
-  }
-  function writeJSON(key, value) {
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
-  }
-
-  // ==========================================
-  // ЛОГИКА SABER-TEX
-  // ==========================================
-  function initSaberSelects() {
-    const fill = (id, data) => {
-      const el = document.getElementById(id);
-      el.innerHTML = "";
-      data.forEach(item => {
-        const opt = document.createElement("option");
-        opt.value = item.code;
-        opt.textContent = `${item.code} (${item.name})`;
-        el.appendChild(opt);
-      });
-    };
-    fill("saberType", SABER_DATA.types);
-    fill("saberModel", SABER_DATA.models);
-    fill("saberSeason", SABER_DATA.seasons);
-    fill("saberColor", SABER_DATA.colors);
-    fill("saberSize", SABER_DATA.sizes);
-    fill("saberHeight", SABER_DATA.heights);
-  }
-
-  function generateSaber() {
-    const type = document.getElementById("saberType").value;
-    const model = document.getElementById("saberModel").value;
-    const season = document.getElementById("saberSeason").value;
-    const color = document.getElementById("saberColor").value;
-    const size = document.getElementById("saberSize").value;
-    const height = document.getElementById("saberHeight").value;
-
-    const sku = `${type}-${model}-${season}-${color}-${size}-${height}`;
-    document.getElementById("saberResult").textContent = sku;
-  }
-
-  // ==========================================
-  // ЛОГИКА ДРУГИХ БРЕНДОВ
-  // ==========================================
-  function cleanToken(value, maxLen = 15) {
-    const s = String(value ?? "").toUpperCase().replace(/[^А-ЯЁ0-9]+/g, "");
-    return s.slice(0, maxLen) || "ХЗ";
-  }
-
-  function checksum(payload) {
-    let hash = 0;
-    for (let i = 0; i < payload.length; i++) {
-      hash = (hash * 31 + payload.charCodeAt(i)) % 97;
-    }
-    return String(hash).padStart(2, "0");
-  }
-
-  function splitAttrs(value) {
-    return String(value ?? "").split(/[\s,;\/|]+/).filter(Boolean);
-  }
-
-  function buildSku({ prefix, group, category, brand, attrs, seq, seqWidth, useParent }) {
-    const parts = [cleanToken(prefix, 8)];
-    if (useParent && group) parts.push(cleanToken(group, 10));
-    parts.push(cleanToken(category, 12));
-    if (brand) parts.push(cleanToken(brand, 10));
-    const ca = attrs.map(a => cleanToken(a, 8)).filter(Boolean);
-    if (ca.length) parts.push(ca.join("-"));
-    parts.push(String(seq).padStart(seqWidth, "0"));
-    const payload = parts.filter(Boolean).join("-");
-    return payload + "-" + checksum(payload);
-  }
-
-  function validateSku(sku) {
-    const s = String(sku ?? "").trim().toUpperCase();
-    if (!s) return { ok: false, reason: "пустая строка" };
-    const idx = s.lastIndexOf("-");
-    if (idx <= 0) return { ok: false, reason: "нет контрольной суммы" };
-    const payload = s.slice(0, idx);
-    const chk = s.slice(idx + 1);
-    if (!/^[0-9]{2}$/.test(chk)) return { ok: false, reason: "КС должна быть 2 цифры" };
-    return checksum(payload) === chk ? { ok: true, reason: "КС совпадает" } : { ok: false, reason: "ожидалось ...-" + checksum(payload) };
-  }
-
-  function nextSeq(key, start) {
-    const cur = state.counters[key];
-    const seq = (typeof cur === "number") ? cur : start;
-    state.counters[key] = seq + 1;
-    writeJSON(LS_COUNTERS, state.counters);
-    return seq;
-  }
-
-  function counterKey(cfg) {
-    if (cfg.counterMode === "global") return "GLOBAL";
-    return [
-      cleanToken(cfg.prefix, 8), cfg.useParent ? cleanToken(cfg.group, 10) : "",
-      cleanToken(cfg.category, 12), cleanToken(cfg.brand, 10),
-      ...cfg.attrs.map(a => cleanToken(a, 8))
-    ].filter(Boolean).join("|");
-  }
-
-  const $ = id => document.getElementById(id);
-  const FIELDS = ["prefix", "brand", "attrs", "qty", "seqWidth", "counterMode", "maxLen", "useParentGroup"];
-
-  function initCategorySelect() {
-    const select = $("categorySelect");
-    select.innerHTML = "";
-    for (const node of CATEGORY_TREE) {
-      const optgroup = document.createElement("optgroup");
-      optgroup.label = node.group;
-      for (const item of node.items) {
-        const opt = document.createElement("option");
-        opt.value = item.name;
-        opt.dataset.group = node.group;
-        opt.textContent = item.parent ? `${item.parent} / ${item.name}` : item.name;
-        optgroup.appendChild(opt);
-      }
-      select.appendChild(optgroup);
-    }
-  }
-
-  function readForm() {
-    const select = $("categorySelect");
-    const selectedOpt = select.options[select.selectedIndex];
-    return {
-      prefix: $("prefix").value, group: selectedOpt.dataset.group || "",
-      category: selectedOpt.value, useParent: $("useParentGroup").checked,
-      brand: $("brand").value, attrs: splitAttrs($("attrs").value),
-      qty: clampInt($("qty").value, 1, 1000, 1), seqWidth: clampInt($("seqWidth").value, 1, 10, 5),
-      counterMode: $("counterMode").value, maxLen: clampInt($("maxLen").value, 8, 120, 40)
-    };
-  }
-
-  function clampInt(v, min, max, fallback) {
-    const n = parseInt(v, 10);
-    return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
-  }
-
-  function persistSettings() {
-    const data = {};
-    for (const f of FIELDS) { const el = $(f); if (el) data[f] = el.type === "checkbox" ? el.checked : el.value; }
-    data["categorySelect"] = $("categorySelect").value;
-    writeJSON(LS_SETTINGS, data);
-  }
-
-  function restoreSettings() {
-    const data = readJSON(LS_SETTINGS, null); if (!data) return;
-    for (const f of FIELDS) {
-      const el = $(f);
-      if (data[f] !== undefined && el) { if (el.type === "checkbox") el.checked = data[f]; else el.value = data[f]; }
-    }
-    if (data["categorySelect"]) {
-      const sel = $("categorySelect");
-      for (let i = 0; i < sel.options.length; i++) {
-        if (sel.options[i].value === data["categorySelect"]) { sel.selectedIndex = i; break; }
-      }
-    }
-  }
-
-  function generateOther() {
-    const cfg = readForm();
-    const key = counterKey(cfg);
-    const rows = [];
-    for (let i = 0; i < cfg.qty; i++) {
-      const seq = nextSeq(key, 1);
-      const sku = buildSku({ ...cfg, seq });
-      rows.push({ sku, len: sku.length, tooLong: sku.length > cfg.maxLen });
-    }
-    state.lastBatch = rows;
-    renderResult(rows, cfg);
-    renderCounters();
-    persistSettings();
-  }
-
-  function renderResult(rows, cfg) {
-    const body = $("resultBody"); body.innerHTML = "";
-    if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="3" class="hint">Пока пусто</td></tr>'; $("summary").textContent = ""; return;
-    }
-    $("summary").textContent = "всего: " + rows.length + " · макс. длина: " + cfg.maxLen;
-    for (let i = 0; i < rows.length; i++) {
-      const r = rows[i];
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${i + 1}</td><td class="mono">${escapeHtml(r.sku)}</td><td>${r.len}</td>`;
-      body.appendChild(tr);
-    }
-  }
-
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  }
-
-  function copyText(text, btnElement) {
-    if (!text) return;
-    navigator.clipboard.writeText(text).then(() => {
-      const orig = btnElement.textContent;
-      btnElement.textContent = "Скопировано!";
-      setTimeout(() => btnElement.textContent = orig, 1500);
-    });
-  }
-
-  function downloadCsv() {
-    if (!state.lastBatch.length) return;
-    const lines = ["sku;length"];
-    for (const r of state.lastBatch) lines.push([r.sku, r.len].join(";"));
-    const blob = new Blob(["\ufeff" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "skus.csv";
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  }
-
-  function renderCounters() {
-    const body = $("countersBody");
-    const keys = Object.keys(state.counters).sort();
-    body.innerHTML = keys.length ? "" : '<tr><td colspan="2" class="hint">Счётчиков пока нет</td></tr>';
-    for (const k of keys) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td class="mono">${escapeHtml(k)}</td><td>${state.counters[k]}</td>`;
-      body.appendChild(tr);
-    }
-  }
-
-  // --- СОБЫТИЯ ---
-  document.querySelectorAll(".main-tab").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".main-tab").forEach(b => b.classList.toggle("active", b === btn));
-      $("section-saber").classList.toggle("hidden", btn.dataset.main !== "saber");
-      $("section-other").classList.toggle("hidden", btn.dataset.main !== "other");
-    });
-  });
-
-  document.querySelectorAll(".sub-tab").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".sub-tab").forEach(b => b.classList.toggle("active", b === btn));
-      $("sub-gen").classList.toggle("hidden", btn.dataset.sub !== "gen");
-      $("sub-val").classList.toggle("hidden", btn.dataset.sub !== "val");
-      $("sub-data").classList.toggle("hidden", btn.dataset.sub !== "data");
-      if (btn.dataset.sub === "data") renderCounters();
-    });
-  });
-
-  // SABER-TEX
-  $("btnGenSaber").addEventListener("click", generateSaber);
-  $("btnCopySaber").addEventListener("click", (e) => {
-    copyText($("saberResult").textContent, e.target);
-  });
-  
-  // Автогенерация при смене любого селекта
-  ["saberType", "saberModel", "saberSeason", "saberColor", "saberSize", "saberHeight"].forEach(id => {
-    $(id).addEventListener("change", generateSaber);
-  });
-
-  // Другие бренды
-  $("btnGenerate").addEventListener("click", generateOther);
-  $("btnCopy").addEventListener("click", (e) => {
-    if(!state.lastBatch.length) return;
-    copyText(state.lastBatch.map(r => r.sku).join("\n"), e.target);
-  });
-  $("btnCsv").addEventListener("click", downloadCsv);
-  $("btnValidate").addEventListener("click", () => {
-    const res = validateSku($("validateInput").value);
-    $("validateResult").innerHTML = res.ok ? `<span style="color:var(--ok)">✔ ${res.reason}</span>` : `<span style="color:var(--err)">✖ ${res.reason}</span>`;
-  });
-  
-  $("btnExportCounters").addEventListener("click", () => {
-    const blob = new Blob([JSON.stringify(state.counters, null, 2)], { type: "application/json" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "sku-counters.json"; a.click();
-  });
-  
-  $("btnImportCounters").addEventListener("click", () => $("importFile").click());
-  $("importFile").addEventListener("change", e => {
-    const file = e.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const data = JSON.parse(reader.result);
-        state.counters = Object.assign({}, state.counters, data);
-        writeJSON(LS_COUNTERS, state.counters);
-        renderCounters();
-        alert("Импортировано!");
-      } catch (err) { alert("Ошибка импорта"); }
-    };
-    reader.readAsText(file);
-    e.target.value = "";
-  });
-
-  $("btnResetCounters").addEventListener("click", () => {
-    if(confirm("Сбросить все счетчики?")) {
-      state.counters = {}; writeJSON(LS_COUNTERS, state.counters); renderCounters();
-    }
-  });
-
-  FIELDS.forEach(f => {
-    const el = $(f);
-    if(el) { el.addEventListener("change", persistSettings); if(el.tagName === "SELECT") el.addEventListener("change", persistSettings); }
-  });
-  $("categorySelect").addEventListener("change", persistSettings);
-
-  // --- ИНИЦИАЛИЗАЦИЯ ---
-  initSaberSelects();
-  generateSaber(); // Сгенерировать первый раз при загрузке
-  initCategorySelect();
-  restoreSettings();
-  renderCounters();
-})();
-</script>
+<!-- Подключаем скрипт. Атрибут defer гарантирует, что скрипт выполнится после загрузки HTML -->
+<script src="script.js" defer></script>
 </body>
 </html>
