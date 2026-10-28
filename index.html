@@ -48,7 +48,7 @@
   <section id="section-other" class="hidden">
     <div class="sub-tabs">
       <button class="sub-tab active" data-sub="gen">Генератор</button>
-      <button class="sub-tab" data-sub="data">Данные (Счётчики)</button>
+      <button class="sub-tab" data-sub="data">Данные (История)</button>
     </div>
 
     <div id="sub-gen">
@@ -62,7 +62,7 @@
             <label>Уникальный код (генерируется)</label>
             <div style="display:flex; gap:8px;">
               <input id="brand" placeholder="X8B2" maxlength="8" style="text-transform:uppercase;" />
-              <button id="btnRandBrand" title="Сгенерировать новый код" style="padding: 8px 12px;">🎲</button>
+              <button id="btnRandBrand" title="Сгенерировать новый код">🎲</button>
             </div>
           </div>
           <div>
@@ -73,16 +73,13 @@
 
         <div class="checkbox-row">
           <input type="checkbox" id="useParentGroup" checked />
-          <label for="useParentGroup" style="margin:0; cursor:pointer;">Добавлять группу (ОБУВЬ-БЕРЦЫ)</label>
+          <label for="useParentGroup">Добавлять группу (напр. ОБУВЬ-БЕРЦЫ)</label>
         </div>
 
         <div class="grid" style="margin-top:12px">
           <div>
             <label>Атрибуты (цвет, размер)</label>
             <input id="attrs" placeholder="ЧЕРНЫЙ 42" />
-          </div>
-          <div>
-            <!-- Пустое место для выравнивания сетки -->
           </div>
         </div>
 
@@ -115,7 +112,7 @@
     <div id="sub-data" class="hidden">
       <div class="panel">
         <strong>История генераций</strong>
-        <div class="hint">Так как используется рандом, счетчики больше не нужны. Но вы можете скачать историю всех сгенерированных артикулов в CSV.</div>
+        <div class="hint">Вы можете скачать историю всех сгенерированных артикулов в CSV.</div>
         <div class="row">
           <button id="btnExportHistory">Экспорт истории (CSV)</button>
           <button id="btnClearHistory" style="color:var(--err)">Очистить историю</button>
