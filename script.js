@@ -56,7 +56,7 @@
     ]}
   ];
 
-  const LS_HISTORY = "sku.history.v3";
+  const LS_HISTORY = "sku.history.v4";
   const state = { history: readJSON(LS_HISTORY, []), lastBatch: [] };
 
   function readJSON(key, fallback) {
@@ -119,14 +119,26 @@
     }
 
     let result = parts.join("-");
-    // Умная обрезка
-    while (result.length > 25 && parts.length > 1) {
-      if (parts[3]) parts.splice(3, 1);
-      else if (parts[2]) parts.splice(2, 1);
-      else parts[1] = parts[1].slice(0, -1);
+    
+    // Умная обрезка до 25 символов
+    if (result.length > 25 && cfg.attrs.length && parts.length > 2) {
+      parts.pop(); // убираем атрибуты
       result = parts.join("-");
     }
-    return result.slice(0, 25);
+    if (result.length > 25 && cfg.brand && parts.length > 2) {
+      // убираем бренд (он всегда идет после категории или группы)
+      const brandClean = cleanToken(cfg.brand, 4);
+      const idx = parts.indexOf(brandClean);
+      if (idx !== -1) parts.splice(idx, 1);
+      result = parts.join("-");
+    }
+    
+    // Если всё равно длинно, режем строку
+    if (result.length > 25) {
+      result = result.slice(0, 25).replace(/-$/, ""); 
+    }
+    
+    return result;
   }
 
   const $ = id => document.getElementById(id);
@@ -159,11 +171,11 @@
   function persistSettings() {
     const data = {};
     for (const f of FIELDS) { const el = $(f); if (el) data[f] = el.type === "checkbox" ? el.checked : el.value; }
-    data["categorySelect"] = $("categorySelect").value; writeJSON("sku.settings.v3", data);
+    data["categorySelect"] = $("categorySelect").value; writeJSON("sku.settings.v4", data);
   }
 
   function restoreSettings() {
-    const data = readJSON("sku.settings.v3", null); if (!data) return;
+    const data = readJSON("sku.settings.v4", null); if (!data) return;
     for (const f of FIELDS) {
       const el = $(f);
       if (data[f] !== undefined && el) { if (el.type === "checkbox") el.checked = data[f]; else el.value = data[f]; }
@@ -174,7 +186,6 @@
         if (sel.options[i].value === data["categorySelect"]) { sel.selectedIndex = i; break; }
       }
     }
-    // Если бренд пустой, ставим рандом по умолчанию
     if (!$("brand").value) $("brand").value = generateRandomCode(4);
   }
 
@@ -184,18 +195,16 @@
     const now = new Date().toLocaleString("ru-RU");
 
     for (let i = 0; i < cfg.qty; i++) {
-      // Каждый раз генерируем новый рандомный код для 100% уникальности
       cfg.brand = generateRandomCode(4);
       const sku = buildSku(cfg);
       rows.push({ sku, len: sku.length });
-      state.history.unshift({ sku, date: now }); // В начало истории
+      state.history.unshift({ sku, date: now });
     }
 
-    // Ограничиваем историю 500 записями, чтобы не забивать память
     if (state.history.length > 500) state.history = state.history.slice(0, 500);
     
     writeJSON(LS_HISTORY, state.history);
-    $("brand").value = generateRandomCode(4); // Обновляем поле ввода на новый код
+    $("brand").value = generateRandomCode(4);
     state.lastBatch = rows; 
     renderResult(rows); 
     renderHistory(); 
@@ -216,7 +225,6 @@
   function renderHistory() {
     const body = $("historyBody"); body.innerHTML = "";
     if (!state.history.length) { body.innerHTML = '<tr><td colspan="2" class="hint">История пуста</td></tr>'; return; }
-    // Показываем последние 50
     state.history.slice(0, 50).forEach(item => {
       const tr = document.createElement("tr");
       tr.innerHTML = `<td class="mono">${escapeHtml(item.sku)}</td><td style="color:var(--muted); font-size:12px;">${item.date}</td>`;
