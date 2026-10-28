@@ -4,7 +4,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Генератор артикулов</title>
-<!-- Подключаем стили -->
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -17,7 +16,6 @@
     <button id="themeToggle" class="theme-btn" title="Переключить тему">🌚</button>
   </div>
 
-  <!-- ГЛАВНЫЕ ВКЛАДКИ -->
   <div class="main-tabs">
     <button class="main-tab active" data-main="saber">SABER-TEX (Регламент)</button>
     <button class="main-tab" data-main="other">Другие бренды (Свободный)</button>
@@ -50,58 +48,68 @@
   <section id="section-other" class="hidden">
     <div class="sub-tabs">
       <button class="sub-tab active" data-sub="gen">Генератор</button>
-      <button class="sub-tab" data-sub="val">Проверка</button>
       <button class="sub-tab" data-sub="data">Данные (Счётчики)</button>
     </div>
 
     <div id="sub-gen">
       <div class="panel">
-        <div class="grid-3">
-          <div><label>Префикс</label><input id="prefix" value="АРТ" maxlength="8" /></div>
-          <div><label>Категория (из списка)</label><select id="categorySelect"></select></div>
-          <div><label>Бренд / Поставщик</label><input id="brand" value="НИКЕ" /></div>
+        <div class="grid">
+          <div>
+            <label>Категория (из списка)</label>
+            <select id="categorySelect"></select>
+          </div>
+          <div>
+            <label>Бренд / Поставщик (необязательно)</label>
+            <input id="brand" placeholder="НИКЕ" />
+          </div>
         </div>
+
         <div class="checkbox-row">
           <input type="checkbox" id="useParentGroup" checked />
-          <label for="useParentGroup" style="margin:0; cursor:pointer;">Включать родительскую группу в артикул (напр. ОБУВЬ-БЕРЦЫ)</label>
+          <label for="useParentGroup" style="margin:0; cursor:pointer;">Добавлять группу (ОБУВЬ-БЕРЦЫ)</label>
         </div>
+
         <div class="grid" style="margin-top:12px">
-          <div><label>Атрибуты (цвет, размер, ...)</label><input id="attrs" value="ЧЕРНЫЙ 42" placeholder="ЧЕРНЫЙ 42 / КРАСНЫЙ XL" /></div>
-          <div><label>Количество</label><input id="qty" type="number" min="1" max="1000" value="5" /></div>
+          <div>
+            <label>Атрибуты (цвет, размер)</label>
+            <input id="attrs" placeholder="ЧЕРНЫЙ 42" />
+          </div>
+          <div>
+            <label>Количество</label>
+            <input id="qty" type="number" min="1" max="1000" value="5" />
+          </div>
         </div>
-        <div class="grid-3" style="margin-top:12px">
-          <div><label>Ширина номера</label><input id="seqWidth" type="number" min="1" max="10" value="5" /></div>
-          <div><label>Режим счётчика</label><select id="counterMode"><option value="per-combo">По комбинации</option><option value="global">Сквозной</option></select></div>
-          <div><label>Макс. длина артикула</label><input id="maxLen" type="number" min="8" max="120" value="40" /></div>
-        </div>
-        <div class="row">
+
+        <div class="row" style="margin-top:16px">
           <button class="primary" id="btnGenerate">Сгенерировать</button>
           <button id="btnCopy">Копировать</button>
           <button id="btnCsv">Скачать CSV</button>
         </div>
+        <div class="hint" style="color:var(--accent); font-weight:bold; margin-top: 10px;">
+          * Максимальная длина артикула ограничена 25 символами. Длинные названия будут автоматически сокращаться.
+        </div>
       </div>
-      <div class="panel">
-        <div class="row" style="margin-top:0"><strong>Результат</strong><span class="hint" id="summary"></span></div>
-        <table>
-          <thead><tr><th style="width:56px">#</th><th>Артикул</th><th style="width:90px">Длина</th></tr></thead>
-          <tbody id="resultBody"><tr><td colspan="3" class="hint">Пока пусто</td></tr></tbody>
-        </table>
-      </div>
-    </div>
 
-    <div id="sub-val" class="hidden">
       <div class="panel">
-        <label>Артикул (свободный формат)</label>
-        <input id="validateInput" class="mono" placeholder="АРТ-ОБУВЬ-БЕРЦЫ-НИКЕ-ЧЕРНЫЙ-42-00001-XX" />
-        <div class="row"><button class="primary" id="btnValidate">Проверить</button></div>
-        <div id="validateResult" class="hint" style="margin-top:12px"></div>
+        <div class="row" style="margin-top:0">
+          <strong>Результат</strong>
+          <span class="hint" id="summary"></span>
+        </div>
+        <table>
+          <thead>
+            <tr><th style="width:56px">#</th><th>Артикул</th><th style="width:80px">Длина</th></tr>
+          </thead>
+          <tbody id="resultBody">
+            <tr><td colspan="3" class="hint">Пока пусто</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
     <div id="sub-data" class="hidden">
       <div class="panel">
         <strong>Счётчики свободного формата</strong>
-        <div class="hint">Хранятся в localStorage. Экспортируйте JSON, чтобы перенести нумерацию.</div>
+        <div class="hint">Экспортируйте JSON, чтобы перенести нумерацию на другое устройство.</div>
         <div class="row">
           <button id="btnExportCounters">Экспорт (JSON)</button>
           <button id="btnImportCounters">Импорт (JSON)</button>
@@ -116,7 +124,6 @@
     </div>
   </section>
 </div>
-<!-- Подключаем скрипт. Атрибут defer гарантирует, что скрипт выполнится после загрузки HTML -->
 <script src="script.js" defer></script>
 </body>
 </html>
