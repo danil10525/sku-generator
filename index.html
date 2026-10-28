@@ -1,1 +1,617 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SKU Generator - Склад (RU)</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #171a21; --line: #262b36;
+    --text: #e6e9ef; --muted: #9aa4b2; --accent: #4f8cff;
+    --ok: #35c07a; --warn: #e0a63a; --err: #e05656;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px; background: var(--bg); color: var(--text);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin-bottom: 20px; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab {
+    padding: 8px 14px; border: 1px solid var(--line); background: var(--panel);
+    color: var(--muted); border-radius: 8px; cursor: pointer;
+  }
+  .tab.active { color: var(--text); border-color: var(--accent); }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 16px; margin-bottom: 16px;
+  }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  input, select {
+    width: 100%; padding: 8px 10px; background: #0f1219; color: var(--text);
+    border: 1px solid var(--line); border-radius: 8px; font: inherit;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .checkbox-row input { width: auto; }
+  button {
+    padding: 9px 14px; border-radius: 8px; border: 1px solid var(--line);
+    background: #1d2230; color: var(--text); cursor: pointer; font: inherit;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  td.mono, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+  .badge { padding: 2px 8px; border-radius: 999px; font-size: 12px; }
+  .badge.ok { background: rgba(53,192,122,.15); color: var(--ok); }
+  .badge.warn { background: rgba(224,166,58,.15); color: var(--warn); }
+  .badge.err { background: rgba(224,86,86,.15); color: var(--err); }
+  .hidden { display: none; }
+  @media (max-width: 720px) {
+    .grid, .grid-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>SKU Generator (Кириллица)</h1>
+  <div class="sub">Формат: <span class="mono">ПРЕФИКС-[ГРУППА]-КАТЕГОРИЯ-БРЕНД-АТРИБУТЫ-НОМЕР-КС</span></div>
 
+  <div class="tabs">
+    <button class="tab active" data-tab="gen">Генератор</button>
+    <button class="tab" data-tab="val">Проверка</button>
+    <button class="tab" data-tab="data">Данные</button>
+  </div>
+
+  <!-- ГЕНЕРАТОР -->
+  <section id="tab-gen">
+    <div class="panel">
+      <div class="grid-3">
+        <div>
+          <label>Префикс</label>
+          <input id="prefix" value="АРТ" maxlength="8" />
+        </div>
+        <div>
+          <label>Категория (из списка)</label>
+          <select id="categorySelect"></select>
+        </div>
+        <div>
+          <label>Бренд / Поставщик</label>
+          <input id="brand" value="НИКЕ" />
+        </div>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="useParentGroup" checked />
+        <label for="useParentGroup" style="margin:0; cursor:pointer;">Включать родительскую группу в артикул (напр. ОБУВЬ-БЕРЦЫ)</label>
+      </div>
+
+      <div class="grid" style="margin-top:12px">
+        <div>
+          <label>Атрибуты (цвет, размер, ...)</label>
+          <input id="attrs" value="ЧЕРНЫЙ 42" placeholder="ЧЕРНЫЙ 42 / КРАСНЫЙ XL" />
+        </div>
+        <div>
+          <label>Количество</label>
+          <input id="qty" type="number" min="1" max="1000" value="5" />
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-top:12px">
+        <div>
+          <label>Ширина номера</label>
+          <input id="seqWidth" type="number" min="1" max="10" value="5" />
+        </div>
+        <div>
+          <label>Режим счётчика</label>
+          <select id="counterMode">
+            <option value="per-combo">По комбинации</option>
+            <option value="global">Сквозной</option>
+          </select>
+        </div>
+        <div>
+          <label>Макс. длина артикула</label>
+          <input id="maxLen" type="number" min="8" max="120" value="40" />
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="primary" id="btnGenerate">Сгенерировать</button>
+        <button id="btnCopy">Копировать</button>
+        <button id="btnCsv">Скачать CSV</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="row" style="margin-top:0">
+        <strong>Результат</strong>
+        <span class="hint" id="summary"></span>
+      </div>
+      <table>
+        <thead>
+          <tr><th style="width:56px">#</th><th>Артикул</th><th style="width:90px">Длина</th><th style="width:110px">Статус</th></tr>
+        </thead>
+        <tbody id="resultBody">
+          <tr><td colspan="4" class="hint">Пока пусто</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ПРОВЕРКА -->
+  <section id="tab-val" class="hidden">
+    <div class="panel">
+      <label>Артикул</label>
+      <input id="validateInput" class="mono" placeholder="АРТ-ОБУВЬ-БЕРЦЫ-НИКЕ-ЧЕРНЫЙ-42-00001-XX" />
+      <div class="row"><button class="primary" id="btnValidate">Проверить</button></div>
+      <div id="validateResult" class="hint" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <!-- ДАННЫЕ -->
+  <section id="tab-data" class="hidden">
+    <div class="panel">
+      <strong>Счётчики</strong>
+      <div class="hint">Хранятся в localStorage этого браузера. Экспортируйте JSON, чтобы перенести нумерацию.</div>
+      <div class="row">
+        <button id="btnExportCounters">Экспорт счётчиков (JSON)</button>
+        <button id="btnImportCounters">Импорт счётчиков (JSON)</button>
+        <button id="btnResetCounters">Сбросить счётчики</button>
+        <input id="importFile" type="file" accept="application/json" class="hidden" />
+      </div>
+      <table>
+        <thead><tr><th>Ключ</th><th style="width:120px">Следующий №</th></tr></thead>
+        <tbody id="countersBody"></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ВАША СТРУКТУРА КАТЕГОРИЙ ИЗ ПАПОК
+  const CATEGORY_TREE = [
+    {
+      group: "Аксессуары",
+      items: [
+        { name: "Бабочки", parent: "Галстуки" },
+        { name: "Готовые", parent: "Галстуки" },
+        { name: "Гойсы", parent: "Галстуки" },
+        { name: "Зажимы", parent: "Галстуки" },
+        { name: "Классические", parent: "Галстуки" },
+        { name: "Мелочевка" },
+        { name: "Обложки" },
+        { name: "Сувениры" }
+      ]
+    },
+    {
+      group: "Головные уборы",
+      items: [
+        { name: "Арафатки" }, { name: "Банданы" }, { name: "Баффы" },
+        { name: "Береты" }, { name: "Кепки" }, { name: "Маски" },
+        { name: "Панамы" }, { name: "Пилотки" }, { name: "Прочее" },
+        { name: "Фуражки" }, { name: "Шапки" }, { name: "Шарфы" }
+      ]
+    },
+    {
+      group: "Носки",
+      items: [
+        { name: "Портянки" }, { name: "Рабочие" }, { name: "Спортивные" },
+        { name: "Термоноски" }, { name: "Форменные" }
+      ]
+    },
+    {
+      group: "Обувь",
+      items: [
+        { name: "Берцы" }, { name: "Ботинки" }, { name: "Кеды" },
+        { name: "Кроссовки" }, { name: "Полуботинки" }, { name: "Прочая" },
+        { name: "Прочее" }, { name: "Сандалии" }, { name: "Сапоги" },
+        { name: "Туфли" }, { name: "Уход" }, { name: "Шнурки" }
+      ]
+    }
+  ];
+
+  const LS_COUNTERS = "sku.counters.v1";
+  const LS_SETTINGS = "sku.settings.v1";
+
+  const state = {
+    counters: readJSON(LS_COUNTERS, {}),
+    lastBatch: []
+  };
+
+  function readJSON(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function writeJSON(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+
+  // --- ЯДРО ГЕНЕРАЦИИ ---
+  
+  // Теперь очищаем только от пробелов и спецсимволов, оставляя кириллицу
+  function cleanToken(value, maxLen = 15) {
+    const s = String(value ?? "").toUpperCase().replace(/[^А-ЯЁ0-9]+/g, "");
+    return s.slice(0, maxLen) || "ХЗ";
+  }
+
+  // Контрольная сумма для кириллицы (простой хэш по кодам символов)
+  function checksum(payload) {
+    let hash = 0;
+    for (let i = 0; i < payload.length; i++) {
+      // Умножаем на 31 (стандартный простой множитель) и берем остаток от 97
+      hash = (hash * 31 + payload.charCodeAt(i)) % 97;
+    }
+    return String(hash).padStart(2, "0");
+  }
+
+  function splitAttrs(value) {
+    return String(value ?? "").split(/[\s,;\/|]+/).filter(Boolean);
+  }
+
+  function buildSku({ prefix, group, category, brand, attrs, seq, seqWidth, useParent }) {
+    const parts = [cleanToken(prefix, 8)];
+    
+    // Добавляем группу (Обувь, Носки и т.д.), если галочка стоит
+    if (useParent && group) parts.push(cleanToken(group, 10));
+    
+    // Добавляем категорию
+    parts.push(cleanToken(category, 12));
+    
+    // Бренд
+    if (brand) parts.push(cleanToken(brand, 10));
+    
+    // Атрибуты
+    const ca = attrs.map(a => cleanToken(a, 8)).filter(Boolean);
+    if (ca.length) parts.push(ca.join("-"));
+    
+    // Номер
+    parts.push(String(seq).padStart(seqWidth, "0"));
+    
+    const payload = parts.filter(Boolean).join("-");
+    return payload + "-" + checksum(payload);
+  }
+
+  function validateSku(sku) {
+    const s = String(sku ?? "").trim().toUpperCase();
+    if (!s) return { ok: false, reason: "пустая строка" };
+    const idx = s.lastIndexOf("-");
+    if (idx <= 0) return { ok: false, reason: "нет контрольной суммы" };
+    const payload = s.slice(0, idx);
+    const chk = s.slice(idx + 1);
+    if (!/^[0-9]{2}$/.test(chk)) return { ok: false, reason: "контрольная сумма должна быть 2 цифры" };
+    
+    let expected;
+    try { expected = checksum(payload); } catch (e) {
+      return { ok: false, reason: "недопустимые символы" };
+    }
+    return expected === chk
+      ? { ok: true, reason: "контрольная сумма совпадает" }
+      : { ok: false, reason: "ожидалось ...-" + expected };
+  }
+
+  function nextSeq(key, start) {
+    const cur = state.counters[key];
+    const seq = (typeof cur === "number") ? cur : start;
+    state.counters[key] = seq + 1;
+    writeJSON(LS_COUNTERS, state.counters);
+    return seq;
+  }
+
+  function counterKey(cfg) {
+    if (cfg.counterMode === "global") return "GLOBAL";
+    return [
+      cleanToken(cfg.prefix, 8),
+      cfg.useParent ? cleanToken(cfg.group, 10) : "",
+      cleanToken(cfg.category, 12),
+      cleanToken(cfg.brand, 10),
+      ...cfg.attrs.map(a => cleanToken(a, 8))
+    ].filter(Boolean).join("|");
+  }
+
+  // --- UI ---
+  const $ = id => document.getElementById(id);
+  const FIELDS = ["prefix", "brand", "attrs", "qty", "seqWidth", "counterMode", "maxLen", "useParentGroup"];
+
+  function initCategorySelect() {
+    const select = $("categorySelect");
+    select.innerHTML = "";
+    for (const node of CATEGORY_TREE) {
+      const optgroup = document.createElement("optgroup");
+      optgroup.label = node.group;
+      
+      for (const item of node.items) {
+        const opt = document.createElement("option");
+        opt.value = item.name;
+        opt.dataset.group = node.group;
+        if (item.parent) {
+            opt.dataset.parent = item.parent;
+            opt.textContent = `${item.parent} / ${item.name}`;
+        } else {
+            opt.textContent = item.name;
+        }
+        optgroup.appendChild(opt);
+      }
+      select.appendChild(optgroup);
+    }
+  }
+
+  function readForm() {
+    const select = $("categorySelect");
+    const selectedOpt = select.options[select.selectedIndex];
+    
+    return {
+      prefix: $("prefix").value,
+      group: selectedOpt.dataset.group || "",
+      category: selectedOpt.value,
+      useParent: $("useParentGroup").checked,
+      brand: $("brand").value,
+      attrs: splitAttrs($("attrs").value),
+      qty: clampInt($("qty").value, 1, 1000, 1),
+      seqWidth: clampInt($("seqWidth").value, 1, 10, 5),
+      counterMode: $("counterMode").value,
+      maxLen: clampInt($("maxLen").value, 8, 120, 40)
+    };
+  }
+
+  function clampInt(v, min, max, fallback) {
+    const n = parseInt(v, 10);
+    if (!Number.isFinite(n)) return fallback;
+    return Math.min(max, Math.max(min, n));
+  }
+
+  function persistSettings() {
+    const data = {};
+    for (const f of FIELDS) {
+        const el = $(f);
+        if (el) data[f] = el.type === "checkbox" ? el.checked : el.value;
+    }
+    data["categorySelect"] = $("categorySelect").value;
+    writeJSON(LS_SETTINGS, data);
+  }
+
+  function restoreSettings() {
+    const data = readJSON(LS_SETTINGS, null);
+    if (!data) return;
+    for (const f of FIELDS) {
+      const el = $(f);
+      if (data[f] !== undefined && el) {
+        if (el.type === "checkbox") el.checked = data[f];
+        else el.value = data[f];
+      }
+    }
+    if (data["categorySelect"]) {
+        const sel = $("categorySelect");
+        for(let i=0; i<sel.options.length; i++){
+            if(sel.options[i].value === data["categorySelect"]){
+                sel.selectedIndex = i;
+                break;
+            }
+        }
+    }
+  }
+
+  function generate() {
+    const cfg = readForm();
+    const key = counterKey(cfg);
+    const rows = [];
+    for (let i = 0; i < cfg.qty; i++) {
+      const seq = nextSeq(key, 1);
+      const sku = buildSku({ ...cfg, seq });
+      rows.push({
+        sku,
+        len: sku.length,
+        tooLong: sku.length > cfg.maxLen,
+        valid: validateSku(sku).ok
+      });
+    }
+    state.lastBatch = rows;
+    renderResult(rows, cfg);
+    renderCounters();
+    persistSettings();
+  }
+
+  function renderResult(rows, cfg) {
+    const body = $("resultBody");
+    body.innerHTML = "";
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="4" class="hint">Пока пусто</td></tr>';
+      $("summary").textContent = "";
+      return;
+    }
+    const bad = rows.filter(r => r.tooLong || !r.valid).length;
+    $("summary").textContent = "всего: " + rows.length + (bad ? ", проблем: " + bad : ", все ок") +
+      " · макс. длина: " + cfg.maxLen;
+
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      const tr = document.createElement("tr");
+      const status = !r.valid
+        ? '<span class="badge err">некорректный</span>'
+        : r.tooLong
+          ? '<span class="badge warn">длинный</span>'
+          : '<span class="badge ok">ok</span>';
+      tr.innerHTML =
+        "<td>" + (i + 1) + "</td>" +
+        '<td class="mono">' + escapeHtml(r.sku) + "</td>" +
+        "<td>" + r.len + "</td>" +
+        "<td>" + status + "</td>";
+      body.appendChild(tr);
+    }
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[c]);
+  }
+
+  function copyBatch() {
+    if (!state.lastBatch.length) return;
+    const text = state.lastBatch.map(r => r.sku).join("\n");
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        () => flash("Скопировано: " + state.lastBatch.length),
+        () => fallbackCopy(text)
+      );
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); flash("Скопировано"); } catch (e) { flash("Не удалось скопировать"); }
+    document.body.removeChild(ta);
+  }
+
+  function flash(msg) {
+    $("summary").textContent = msg;
+  }
+
+  function downloadCsv() {
+    if (!state.lastBatch.length) return;
+    const lines = ["sku;length;status"];
+    for (const r of state.lastBatch) {
+      const status = !r.valid ? "invalid" : (r.tooLong ? "too_long" : "ok");
+      lines.push([r.sku, r.len, status].join(";"));
+    }
+    // BOM нужен для того, чтобы Excel правильно открыл кириллицу
+    download("\ufeff" + lines.join("\r\n"), "skus.csv", "text/csv;charset=utf-8");
+  }
+
+  function download(content, filename, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function renderCounters() {
+    const body = $("countersBody");
+    const keys = Object.keys(state.counters).sort();
+    body.innerHTML = "";
+    if (!keys.length) {
+      body.innerHTML = '<tr><td colspan="2" class="hint">Счётчиков пока нет</td></tr>';
+      return;
+    }
+    for (const k of keys) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = '<td class="mono">' + escapeHtml(k) + "</td><td>" + state.counters[k] + "</td>";
+      body.appendChild(tr);
+    }
+  }
+
+  function exportCounters() {
+    download(JSON.stringify(state.counters, null, 2), "sku-counters.json", "application/json");
+  }
+
+  function importCounters(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(String(reader.result));
+        if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("bad format");
+        const merged = Object.assign({}, state.counters);
+        for (const [k, v] of Object.entries(data)) {
+          const n = parseInt(v, 10);
+          if (k && Number.isFinite(n) && n > 0) merged[k] = n;
+        }
+        state.counters = merged;
+        writeJSON(LS_COUNTERS, state.counters);
+        renderCounters();
+        flash("Импортировано ключей: " + Object.keys(data).length);
+      } catch (e) {
+        flash("Ошибка импорта: " + e.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function resetCounters() {
+    if (!confirm("Сбросить все счётчики? Нумерация начнётся заново.")) return;
+    state.counters = {};
+    writeJSON(LS_COUNTERS, state.counters);
+    renderCounters();
+    flash("Счётчики сброшены");
+  }
+
+  function validateFromInput() {
+    const res = validateSku($("validateInput").value);
+    const el = $("validateResult");
+    if (res.ok) {
+      el.innerHTML = '<span class="badge ok">OK</span> ' + escapeHtml(res.reason);
+    } else {
+      el.innerHTML = '<span class="badge err">Ошибка</span> ' + escapeHtml(res.reason);
+    }
+  }
+
+  // --- СОБЫТИЯ ---
+  document.querySelectorAll(".tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b === btn));
+      $("tab-gen").classList.toggle("hidden", btn.dataset.tab !== "gen");
+      $("tab-val").classList.toggle("hidden", btn.dataset.tab !== "val");
+      $("tab-data").classList.toggle("hidden", btn.dataset.tab !== "data");
+      if (btn.dataset.tab === "data") renderCounters();
+    });
+  });
+
+  $("btnGenerate").addEventListener("click", generate);
+  $("btnCopy").addEventListener("click", copyBatch);
+  $("btnCsv").addEventListener("click", downloadCsv);
+  $("btnValidate").addEventListener("click", validateFromInput);
+  $("validateInput").addEventListener("keydown", e => { if (e.key === "Enter") validateFromInput(); });
+  $("btnExportCounters").addEventListener("click", exportCounters);
+  $("btnResetCounters").addEventListener("click", resetCounters);
+  $("btnImportCounters").addEventListener("click", () => $("importFile").click());
+  $("importFile").addEventListener("change", e => {
+    const f = e.target.files && e.target.files[0];
+    if (f) importCounters(f);
+    e.target.value = "";
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !$("tab-gen").classList.contains("hidden") && e.target.tagName === "INPUT") {
+      e.preventDefault();
+      generate();
+    }
+  });
+
+  FIELDS.forEach(f => {
+      const el = $(f);
+      if (el) {
+          el.addEventListener("change", persistSettings);
+          if (el.tagName === "SELECT") el.addEventListener("change", persistSettings);
+      }
+  });
+  $("categorySelect").addEventListener("change", persistSettings);
+
+  // --- ИНИЦИАЛИЗАЦИЯ ---
+  initCategorySelect();
+  restoreSettings();
+  renderCounters();
+})();
+</script>
+</body>
+</html>
