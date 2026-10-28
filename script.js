@@ -48,31 +48,31 @@
     heights: [ { code: "158", name: "158-164" }, { code: "170", name: "170-176" }, { code: "182", name: "182-188" } ]
   };
 
-  // --- ДАННЫЕ ДРУГИХ БРЕНДОВ ---
+  // --- ДАННЫЕ ДЛЯ ДРУГИХ БРЕНДОВ ---
   const CATEGORY_TREE = [
-    { group: "Аксессуары", items: [
-      { name: "Бабочки", parent: "Галстуки" }, { name: "Готовые", parent: "Галстуки" },
-      { name: "Гюйсы", parent: "Галстуки" }, { name: "Зажимы", parent: "Галстуки" },
-      { name: "Классические", parent: "Галстуки" }, { name: "Мелочевка" },
-      { name: "Обложки" }, { name: "Сувениры" }
+    { group: "АКСЕССУАРЫ", items: [
+      { name: "БАБОЧКИ", parent: "ГАЛСТУКИ" }, { name: "ГОТОВЫЕ", parent: "ГАЛСТУКИ" },
+      { name: "ГОЙСЫ", parent: "ГАЛСТУКИ" }, { name: "ЗАЖИМЫ", parent: "ГАЛСТУКИ" },
+      { name: "КЛАССИЧЕСКИЕ", parent: "ГАЛСТУКИ" }, { name: "МЕЛОЧЕВКА" },
+      { name: "ОБЛОЖКИ" }, { name: "СУВЕНИРЫ" }
     ]},
-    { group: "Головные уборы", items: [
-      { name: "Арафатки" }, { name: "Банданы" }, { name: "Баффы" }, { name: "Береты" },
-      { name: "Кепки" }, { name: "Маски" }, { name: "Панамы" }, { name: "Пилотки" },
-      { name: "Прочее" }, { name: "Фуражки" }, { name: "Шапки" }, { name: "Шарфы" }
+    { group: "ГОЛОВНЫЕ УБОРЫ", items: [
+      { name: "АРАФАТКИ" }, { name: "БАНДАНЫ" }, { name: "БАФФЫ" }, { name: "БЕРЕТЫ" },
+      { name: "КЕПКИ" }, { name: "МАСКИ" }, { name: "ПАНАМЫ" }, { name: "ПИЛОТКИ" },
+      { name: "ПРОЧЕЕ" }, { name: "ФУРАЖКИ" }, { name: "ШАПКИ" }, { name: "ШАРФЫ" }
     ]},
-    { group: "Носки", items: [
-      { name: "Портянки" }, { name: "Рабочие" }, { name: "Спортивные" }, { name: "Термоноски" }, { name: "Форменные" }
+    { group: "НОСКИ", items: [
+      { name: "ПОРТЯНКИ" }, { name: "РАБОЧИЕ" }, { name: "СПОРТИВНЫЕ" }, { name: "ТЕРМОНОСКИ" }, { name: "ФОРМЕННЫЕ" }
     ]},
-    { group: "Обувь", items: [
-      { name: "Берцы" }, { name: "Ботинки" }, { name: "Кеды" }, { name: "Кроссовки" },
-      { name: "Полуботинки" }, { name: "Прочая" }, { name: "Прочее" }, { name: "Сандалии" },
-      { name: "Сапоги" }, { name: "Туфли" }, { name: "Уход" }, { name: "Шнурки" }
+    { group: "ОБУВЬ", items: [
+      { name: "БЕРЦЫ" }, { name: "БОТИНКИ" }, { name: "КЕДЫ" }, { name: "КРОССОВКИ" },
+      { name: "ПОЛУБОТИНКИ" }, { name: "ПРОЧАЯ" }, { name: "ПРОЧЕЕ" }, { name: "САНДАЛИИ" },
+      { name: "САПОГИ" }, { name: "ТУФЛИ" }, { name: "УХОД" }, { name: "ШНУРКИ" }
     ]}
   ];
 
-  const LS_COUNTERS = "sku.counters.v1";
-  const LS_SETTINGS = "sku.settings.v1";
+  const LS_COUNTERS = "sku.counters.v2"; // Обновил версию из-за смены формата
+  const LS_SETTINGS = "sku.settings.v2";
   const state = { counters: readJSON(LS_COUNTERS, {}), lastBatch: [] };
 
   function readJSON(key, fallback) {
@@ -112,38 +112,54 @@
     document.getElementById("saberResult").textContent = `${type}-${model}-${season}-${color}-${size}-${height}`;
   }
 
-  // --- ЛОГИКА ДРУГИХ БРЕНДОВ ---
+  // --- ЛОГИКА ДРУГИХ БРЕНДОВ (ОПТИМИЗАЦИЯ ДО 25 СИМВОЛОВ) ---
   function cleanToken(value, maxLen = 15) {
     const s = String(value ?? "").toUpperCase().replace(/[^А-ЯЁ0-9]+/g, "");
-    return s.slice(0, maxLen) || "ХЗ";
-  }
-  function checksum(payload) {
-    let hash = 0;
-    for (let i = 0; i < payload.length; i++) { hash = (hash * 31 + payload.charCodeAt(i)) % 97; }
-    return String(hash).padStart(2, "0");
-  }
-  function splitAttrs(value) { return String(value ?? "").split(/[\s,;\/|]+/).filter(Boolean); }
-
-  function buildSku({ prefix, group, category, brand, attrs, seq, seqWidth, useParent }) {
-    const parts = [cleanToken(prefix, 8)];
-    if (useParent && group) parts.push(cleanToken(group, 10));
-    parts.push(cleanToken(category, 12));
-    if (brand) parts.push(cleanToken(brand, 10));
-    const ca = attrs.map(a => cleanToken(a, 8)).filter(Boolean);
-    if (ca.length) parts.push(ca.join("-"));
-    parts.push(String(seq).padStart(seqWidth, "0"));
-    const payload = parts.filter(Boolean).join("-");
-    return payload + "-" + checksum(payload);
+    return s.slice(0, maxLen) || "";
   }
 
-  function validateSku(sku) {
-    const s = String(sku ?? "").trim().toUpperCase();
-    if (!s) return { ok: false, reason: "пустая строка" };
-    const idx = s.lastIndexOf("-");
-    if (idx <= 0) return { ok: false, reason: "нет контрольной суммы" };
-    const payload = s.slice(0, idx), chk = s.slice(idx + 1);
-    if (!/^[0-9]{2}$/.test(chk)) return { ok: false, reason: "КС должна быть 2 цифры" };
-    return checksum(payload) === chk ? { ok: true, reason: "КС совпадает" } : { ok: false, reason: "ожидалось ...-" + checksum(payload) };
+  function buildSku(cfg, seq) {
+    let parts = [];
+    
+    // 1. Группа (макс 6 симв)
+    if (cfg.useParent && cfg.group) parts.push(cleanToken(cfg.group, 6));
+    
+    // 2. Категория (макс 10 симв)
+    parts.push(cleanToken(cfg.category, 10));
+    
+    // 3. Бренд (макс 4 симв)
+    if (cfg.brand) parts.push(cleanToken(cfg.brand, 4));
+    
+    // 4. Атрибуты (макс 2 симв на каждый, макс 2 шт)
+    if (cfg.attrs.length) {
+      const shortAttrs = cfg.attrs.slice(0, 2).map(a => cleanToken(a, 2)).filter(Boolean);
+      if (shortAttrs.length) parts.push(shortAttrs.join(""));
+    }
+    
+    // 5. Номер (до 6 цифр)
+    parts.push(String(seq).padStart(4, "0"));
+
+    // Собираем и обрезаем, если > 25 символов
+    let result = parts.join("-");
+    
+    // Умная обрезка: если длинно, сначала режем атрибуты, потом бренд
+    while (result.length > 25 && parts.length > 2) {
+      // Если есть атрибуты (индекс 3), удаляем их
+      if (parts[3]) {
+        parts.splice(3, 1);
+      } 
+      // Если нет атрибутов, но есть бренд (индекс 2), удаляем его
+      else if (parts[2] && parts.length === 4) { 
+        parts.splice(2, 1);
+      }
+      // Если всё еще длинно, подрезаем категорию (индекс 1)
+      else {
+        parts[1] = parts[1].slice(0, -1);
+      }
+      result = parts.join("-");
+    }
+
+    return result.slice(0, 25); // Жесткая гарантия
   }
 
   function nextSeq(key, start) {
@@ -156,13 +172,11 @@
 
   function counterKey(cfg) {
     if (cfg.counterMode === "global") return "GLOBAL";
-    return [cleanToken(cfg.prefix, 8), cfg.useParent ? cleanToken(cfg.group, 10) : "",
-      cleanToken(cfg.category, 12), cleanToken(cfg.brand, 10),
-      ...cfg.attrs.map(a => cleanToken(a, 8))].filter(Boolean).join("|");
+    return [cfg.group, cfg.category, cfg.brand, ...cfg.attrs].join("|");
   }
 
   const $ = id => document.getElementById(id);
-  const FIELDS = ["prefix", "brand", "attrs", "qty", "seqWidth", "counterMode", "maxLen", "useParentGroup"];
+  const FIELDS = ["brand", "attrs", "qty", "useParentGroup"];
 
   function initCategorySelect() {
     const select = $("categorySelect"); select.innerHTML = "";
@@ -181,16 +195,11 @@
   function readForm() {
     const select = $("categorySelect"); const selectedOpt = select.options[select.selectedIndex];
     return {
-      prefix: $("prefix").value, group: selectedOpt.dataset.group || "",
+      group: selectedOpt.dataset.group || "",
       category: selectedOpt.value, useParent: $("useParentGroup").checked,
-      brand: $("brand").value, attrs: splitAttrs($("attrs").value),
-      qty: clampInt($("qty").value, 1, 1000, 1), seqWidth: clampInt($("seqWidth").value, 1, 10, 5),
-      counterMode: $("counterMode").value, maxLen: clampInt($("maxLen").value, 8, 120, 40)
+      brand: $("brand").value, attrs: String($("attrs").value ?? "").split(/[\s,;\/|]+/).filter(Boolean),
+      qty: parseInt($("qty").value) || 1, counterMode: "per-combo"
     };
-  }
-
-  function clampInt(v, min, max, fallback) {
-    const n = parseInt(v, 10); return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
   }
 
   function persistSettings() {
@@ -216,19 +225,20 @@
   function generateOther() {
     const cfg = readForm(), key = counterKey(cfg), rows = [];
     for (let i = 0; i < cfg.qty; i++) {
-      const seq = nextSeq(key, 1), sku = buildSku({ ...cfg, seq });
+      const seq = nextSeq(key, 1);
+      const sku = buildSku(cfg, seq);
       rows.push({ sku, len: sku.length });
     }
-    state.lastBatch = rows; renderResult(rows, cfg); renderCounters(); persistSettings();
+    state.lastBatch = rows; renderResult(rows); renderCounters(); persistSettings();
   }
 
-  function renderResult(rows, cfg) {
+  function renderResult(rows) {
     const body = $("resultBody"); body.innerHTML = "";
     if (!rows.length) { body.innerHTML = '<tr><td colspan="3" class="hint">Пока пусто</td></tr>'; $("summary").textContent = ""; return; }
-    $("summary").textContent = "всего: " + rows.length + " · макс. длина: " + cfg.maxLen;
+    $("summary").textContent = "всего: " + rows.length;
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i], tr = document.createElement("tr");
-      tr.innerHTML = `<td>${i + 1}</td><td class="mono">${escapeHtml(r.sku)}</td><td>${r.len}</td>`;
+      tr.innerHTML = `<td>${i + 1}</td><td class="mono">${escapeHtml(r.sku)}</td><td style="color:var(--ok)">${r.len} / 25</td>`;
       body.appendChild(tr);
     }
   }
@@ -275,7 +285,6 @@
     btn.addEventListener("click", () => {
       document.querySelectorAll(".sub-tab").forEach(b => b.classList.toggle("active", b === btn));
       $("sub-gen").classList.toggle("hidden", btn.dataset.sub !== "gen");
-      $("sub-val").classList.toggle("hidden", btn.dataset.sub !== "val");
       $("sub-data").classList.toggle("hidden", btn.dataset.sub !== "data");
       if (btn.dataset.sub === "data") renderCounters();
     });
@@ -290,10 +299,6 @@
   $("btnGenerate").addEventListener("click", generateOther);
   $("btnCopy").addEventListener("click", (e) => { if(state.lastBatch.length) copyText(state.lastBatch.map(r => r.sku).join("\n"), e.target); });
   $("btnCsv").addEventListener("click", downloadCsv);
-  $("btnValidate").addEventListener("click", () => {
-    const res = validateSku($("validateInput").value);
-    $("validateResult").innerHTML = res.ok ? `<span style="color:var(--ok)">✔ ${res.reason}</span>` : `<span style="color:var(--err)">✖ ${res.reason}</span>`;
-  });
   
   $("btnExportCounters").addEventListener("click", () => {
     const blob = new Blob([JSON.stringify(state.counters, null, 2)], { type: "application/json" });
@@ -319,7 +324,7 @@
   });
 
   FIELDS.forEach(f => {
-    const el = $(f); if(el) { el.addEventListener("change", persistSettings); if(el.tagName === "SELECT") el.addEventListener("change", persistSettings); }
+    const el = $(f); if(el) { el.addEventListener("change", persistSettings); }
   });
   $("categorySelect").addEventListener("change", persistSettings);
 
