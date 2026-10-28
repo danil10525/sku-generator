@@ -53,14 +53,21 @@
 
     <div id="sub-gen">
       <div class="panel">
-        <div class="grid">
+        <div class="grid-3">
           <div>
             <label>Категория (из списка)</label>
             <select id="categorySelect"></select>
           </div>
           <div>
-            <label>Бренд / Поставщик (необязательно)</label>
-            <input id="brand" placeholder="НИКЕ" />
+            <label>Уникальный код (генерируется)</label>
+            <div style="display:flex; gap:8px;">
+              <input id="brand" placeholder="X8B2" maxlength="8" style="text-transform:uppercase;" />
+              <button id="btnRandBrand" title="Сгенерировать новый код" style="padding: 8px 12px;">🎲</button>
+            </div>
+          </div>
+          <div>
+            <label>Количество</label>
+            <input id="qty" type="number" min="1" max="1000" value="5" />
           </div>
         </div>
 
@@ -75,8 +82,7 @@
             <input id="attrs" placeholder="ЧЕРНЫЙ 42" />
           </div>
           <div>
-            <label>Количество</label>
-            <input id="qty" type="number" min="1" max="1000" value="5" />
+            <!-- Пустое место для выравнивания сетки -->
           </div>
         </div>
 
@@ -86,7 +92,7 @@
           <button id="btnCsv">Скачать CSV</button>
         </div>
         <div class="hint" style="color:var(--accent); font-weight:bold; margin-top: 10px;">
-          * Максимальная длина артикула ограничена 25 символами. Длинные названия будут автоматически сокращаться.
+          * Рандомный код делает артикул уникальным навсегда. Максимальная длина — 25 символов.
         </div>
       </div>
 
@@ -108,17 +114,15 @@
 
     <div id="sub-data" class="hidden">
       <div class="panel">
-        <strong>Счётчики свободного формата</strong>
-        <div class="hint">Экспортируйте JSON, чтобы перенести нумерацию на другое устройство.</div>
+        <strong>История генераций</strong>
+        <div class="hint">Так как используется рандом, счетчики больше не нужны. Но вы можете скачать историю всех сгенерированных артикулов в CSV.</div>
         <div class="row">
-          <button id="btnExportCounters">Экспорт (JSON)</button>
-          <button id="btnImportCounters">Импорт (JSON)</button>
-          <button id="btnResetCounters">Сбросить</button>
-          <input id="importFile" type="file" accept="application/json" class="hidden" />
+          <button id="btnExportHistory">Экспорт истории (CSV)</button>
+          <button id="btnClearHistory" style="color:var(--err)">Очистить историю</button>
         </div>
         <table>
-          <thead><tr><th>Ключ</th><th style="width:120px">Следующий №</th></tr></thead>
-          <tbody id="countersBody"></tbody>
+          <thead><tr><th>Артикул</th><th style="width:150px">Дата генерации</th></tr></thead>
+          <tbody id="historyBody"></tbody>
         </table>
       </div>
     </div>
