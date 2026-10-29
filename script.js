@@ -36,7 +36,7 @@
 
   // --- ДЕРЕВО КАТЕГОРИЙ ---
   const CATEGORY_TREE = [
-    { group: "АКСЕССУАРЫ", items: [ { name: "ГАЛСТУКИ" }, { name: "ГЮЙСЫ" }, { name: "МАНИШКИ" }, { name: "ПОДВОРОТНИЧКИ" }, { name: "ОБЛОЖКИ И КОРОЧКИ" }, { name: "БЕЙДЖИ И ШНУРЫ" }, { name: "ГАЛАНТЕРЕЯ" } ] },
+    { group: "АКСЕССУАРЫ", items: [ { name: "ГАЛСТУКИ" }, { name: "ГОЙСЫ" }, { name: "МАНИШКИ" }, { name: "ПОДВОРОТНИЧКИ" }, { name: "ОБЛОЖКИ И КОРОЧКИ" }, { name: "БЕЙДЖИ И ШНУРЫ" }, { name: "ГАЛАНТЕРЕЯ" } ] },
     { group: "СУВЕНИРЫ", items: [ { name: "ПОСУДА" }, { name: "ФЛАГИ И ВЫМПЕЛЫ" }, { name: "БРЕЛОКИ И МАГНИТЫ" }, { name: "ЧАСЫ" }, { name: "ПОДАРОЧНЫЕ НАБОРЫ" } ] },
     { group: "ФУРНИТУРА", items: [ { name: "ФУРНИТУРА" }, { name: "ПОГОНЫ" }, { name: "ШЕВРОНЫ И ПАТЧИ" }, { name: "КОКАРДЫ" }, { name: "ЗНАЧКИ И МЕДАЛИ" }, { name: "ЗВЕЗДЫ И ЛЫЧКИ" }, { name: "АКСЕЛЬБАНТЫ" }, { name: "ПУГОВИЦЫ И ПРЯЖКИ" }, { name: "ЛИПУЧКИ И СТРОПЫ" }, { name: "ЗАЖИМЫ ДЛЯ ГАЛСТУКОВ" } ] },
     { group: "СНАРЯЖЕНИЕ", items: [ { name: "РАЗГРУЗОЧНЫЕ СИСТЕМЫ" }, { name: "ПОЯСА И ПЛАТФОРМЫ" }, { name: "ПОДСУМКИ И ЧЕХЛЫ" }, { name: "КОБУРЫ" }, { name: "СУМКИ И РЮКЗАКИ" }, { name: "СПЕЦСРЕДСТВА" }, { name: "АПТЕЧКИ И МЕДИЦИНА" }, { name: "ТУРИЗМ И КЕМПИНГ" }, { name: "ФЛЯГИ И КОТЕЛКИ" }, { name: "ФОНАРИКИ" }, { name: "ИНСТРУМЕНТЫ" }, { name: "ЭЛЕКТРОНИКА И СВЯЗЬ" } ] },
@@ -60,47 +60,66 @@
     return result;
   }
 
-  // --- УМНЫЙ ВВОД ДЛЯ SABER-TEX ---
+  // --- УМНЫЙ ВВОД ДЛЯ SABER-TEX (SELECT + CUSTOM) ---
   function initSaberInputs() {
-    const fillDatalist = (listId, data) => {
-      const dl = document.getElementById(listId);
-      dl.innerHTML = "";
+    const setupSelect = (selectId, inputId, data) => {
+      const select = document.getElementById(selectId);
+      const customInput = document.getElementById(inputId);
+      
+      select.innerHTML = "";
       data.forEach(item => {
         const opt = document.createElement("option");
         opt.value = item.code;
-        opt.textContent = `${item.code} - ${item.name}`; 
-        dl.appendChild(opt);
+        opt.textContent = `${item.code} (${item.name})`;
+        select.appendChild(opt);
       });
+      
+      // Добавляем возможность ввода своего значения
+      const customOpt = document.createElement("option");
+      customOpt.value = "__CUSTOM__";
+      customOpt.textContent = "--- Свой код ---";
+      select.appendChild(customOpt);
+
+      // Обработка переключения
+      select.addEventListener("change", () => {
+        if (select.value === "__CUSTOM__") {
+          customInput.classList.remove("hidden");
+          customInput.focus();
+        } else {
+          customInput.classList.add("hidden");
+          customInput.value = "";
+        }
+        generateSaber();
+      });
+
+      // Обработка ввода в кастомное поле
+      customInput.addEventListener("input", generateSaber);
     };
     
-    fillDatalist("datalistType", SABER_DATA.types);
-    fillDatalist("datalistModel", SABER_DATA.models);
-    fillDatalist("datalistSeason", SABER_DATA.seasons);
-    fillDatalist("datalistColor", SABER_DATA.colors);
-    fillDatalist("datalistSize", SABER_DATA.sizes);
-    fillDatalist("datalistHeight", SABER_DATA.heights);
-    
-    document.getElementById("saberType").value = SABER_DATA.types[0].code;
-    document.getElementById("saberModel").value = SABER_DATA.models[0].code;
-    document.getElementById("saberSeason").value = SABER_DATA.seasons[0].code;
-    document.getElementById("saberColor").value = SABER_DATA.colors[0].code;
-    document.getElementById("saberSize").value = SABER_DATA.sizes[0].code;
-    document.getElementById("saberHeight").value = SABER_DATA.heights[0].code;
+    setupSelect("saberType", "saberTypeCustom", SABER_DATA.types);
+    setupSelect("saberModel", "saberModelCustom", SABER_DATA.models);
+    setupSelect("saberSeason", "saberSeasonCustom", SABER_DATA.seasons);
+    setupSelect("saberColor", "saberColorCustom", SABER_DATA.colors);
+    setupSelect("saberSize", "saberSizeCustom", SABER_DATA.sizes);
+    setupSelect("saberHeight", "saberHeightCustom", SABER_DATA.heights);
   }
 
   function generateSaber() {
-    const getCleanCode = (id) => {
-      let val = document.getElementById(id).value;
-      if (val.includes(" ")) val = val.split(" ")[0];
-      return val.replace(/[^А-ЯЁA-Z0-9]/g, "").toUpperCase() || "XX";
+    const getValue = (selectId, customId) => {
+      const select = document.getElementById(selectId);
+      if (select.value === "__CUSTOM__") {
+        let val = document.getElementById(customId).value;
+        return val.replace(/[^А-ЯЁA-Z0-9]/g, "").toUpperCase() || "XX";
+      }
+      return select.value;
     };
 
-    const type = getCleanCode("saberType");
-    const model = getCleanCode("saberModel");
-    const season = getCleanCode("saberSeason");
-    const color = getCleanCode("saberColor");
-    const size = getCleanCode("saberSize");
-    const height = getCleanCode("saberHeight");
+    const type = getValue("saberType", "saberTypeCustom");
+    const model = getValue("saberModel", "saberModelCustom");
+    const season = getValue("saberSeason", "saberSeasonCustom");
+    const color = getValue("saberColor", "saberColorCustom");
+    const size = getValue("saberSize", "saberSizeCustom");
+    const height = getValue("saberHeight", "saberHeightCustom");
     
     document.getElementById("saberResult").textContent = `${type}-${model}-${season}-${color}-${size}-${height}`;
   }
@@ -268,11 +287,6 @@
 
   $("btnGenSaber").addEventListener("click", generateSaber);
   $("btnCopySaber").addEventListener("click", (e) => copyText($("saberResult").textContent, e.target));
-  
-  ["saberType", "saberModel", "saberSeason", "saberColor", "saberSize", "saberHeight"].forEach(id => {
-    $(id).addEventListener("input", generateSaber);
-    $(id).addEventListener("change", generateSaber);
-  });
 
   $("btnRandBrand").addEventListener("click", () => { $("brand").value = generateRandomCode(4); });
   $("btnGenerate").addEventListener("click", generateOther);
