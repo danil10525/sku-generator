@@ -22,46 +22,46 @@
     <button class="main-tab" data-main="other">Другие бренды (Свободный)</button>
   </div>
 
-  <!-- ВКЛАДКА SABER-TEX С УМНЫМ ПОИСКОМ -->
+  <!-- ВКЛАДКА SABER-TEX -->
   <section id="section-saber">
     <div class="panel">
       <div class="grid-6">
         <div>
           <label>Тип</label>
-          <input id="saberType" list="datalistType" placeholder="Выбор или ввод..." autocomplete="off" />
-          <datalist id="datalistType"></datalist>
+          <select id="saberType"></select>
+          <input id="saberTypeCustom" class="hidden custom-input" placeholder="Свой код..." />
         </div>
         <div>
           <label>Модель</label>
-          <input id="saberModel" list="datalistModel" placeholder="Выбор или ввод..." autocomplete="off" />
-          <datalist id="datalistModel"></datalist>
+          <select id="saberModel"></select>
+          <input id="saberModelCustom" class="hidden custom-input" placeholder="Свой код..." />
         </div>
         <div>
           <label>Сезон</label>
-          <input id="saberSeason" list="datalistSeason" placeholder="Выбор или ввод..." autocomplete="off" />
-          <datalist id="datalistSeason"></datalist>
+          <select id="saberSeason"></select>
+          <input id="saberSeasonCustom" class="hidden custom-input" placeholder="Свой код..." />
         </div>
         <div>
           <label>Цвет</label>
-          <input id="saberColor" list="datalistColor" placeholder="Выбор или ввод..." autocomplete="off" />
-          <datalist id="datalistColor"></datalist>
+          <select id="saberColor"></select>
+          <input id="saberColorCustom" class="hidden custom-input" placeholder="Свой код..." />
         </div>
         <div>
           <label>Размер</label>
-          <input id="saberSize" list="datalistSize" placeholder="Выбор или ввод..." autocomplete="off" />
-          <datalist id="datalistSize"></datalist>
+          <select id="saberSize"></select>
+          <input id="saberSizeCustom" class="hidden custom-input" placeholder="Свой код..." />
         </div>
         <div>
           <label>Рост</label>
-          <input id="saberHeight" list="datalistHeight" placeholder="Выбор или ввод..." autocomplete="off" />
-          <datalist id="datalistHeight"></datalist>
+          <select id="saberHeight"></select>
+          <input id="saberHeightCustom" class="hidden custom-input" placeholder="Свой код..." />
         </div>
       </div>
       <div class="row">
         <button class="primary" id="btnGenSaber">Сгенерировать артикул</button>
         <button id="btnCopySaber">Копировать</button>
       </div>
-      <div class="hint">Начните вводить название (например, "Брю"), чтобы найти код. Если кода нет в списке — просто впишите свой (например, "ШРТ").</div>
+      <div class="hint">Если нужного варианта нет в списке, выберите <b>«--- Свой код ---»</b> и впишите его вручную.</div>
     </div>
     <div class="panel">
       <div class="row" style="margin-top:0"><strong>Результат</strong></div>
