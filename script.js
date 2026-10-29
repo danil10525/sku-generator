@@ -1,7 +1,7 @@
 (() => {
   "use strict";
-
-  // --- УПРАВЛЕНИЕ ТЕМОЙ ---
+  
+  // --- ТЕМА ---
   const themeToggle = document.getElementById("themeToggle");
   const currentTheme = localStorage.getItem("theme") || "dark";
   if (currentTheme === "light") {
@@ -24,7 +24,7 @@
     }
   });
 
-  // --- ДАННЫЕ SABER-TEX ---
+  // --- СПРАВОЧНИКИ SABER-TEX ---
   const SABER_DATA = {
     types: [{ code: "БР", name: "Брюки" }, { code: "БРЮ", name: "Брюки (альт)" }, { code: "КОС", name: "Костюм" }, { code: "КУР", name: "Куртка" }, { code: "ФУТ", name: "Футболка" }],
     models: [{ code: "БРК", name: "Беркут-К" }, { code: "ГВР", name: "Гвардия" }],
@@ -34,125 +34,74 @@
     heights: [{ code: "158", name: "158-164" }, { code: "170", name: "170-176" }, { code: "182", name: "182-188" }]
   };
 
-  // =====================================================================
-  // НАШ ДЕРЕВО КАТЕГОРИЙ (ИЗ ВАШИХ СКРИНШОТОВ)
-  // =====================================================================
+  // --- ДЕРЕВО КАТЕГОРИЙ ---
   const CATEGORY_TREE = [
-    { 
-      group: "АКСЕССУАРЫ", 
-      items: [
-        { name: "ГАЛСТУКИ" }, { name: "ГОЙСЫ" }, { name: "МАНИШКИ" }, 
-        { name: "ПОДВОРОТНИЧКИ" }, { name: "ОБЛОЖКИ И КОРОЧКИ" }, 
-        { name: "БЕЙДЖИ И ШНУРЫ" }, { name: "ГАЛАНТЕРЕЯ" }
-      ]
-    },
-    { 
-      group: "СУВЕНИРЫ", 
-      items: [
-        { name: "ПОСУДА" }, { name: "ФЛАГИ И ВЫМПЕЛЫ" }, { name: "БРЕЛОКИ И МАГНИТЫ" }, 
-        { name: "ЧАСЫ" }, { name: "ПОДАРОЧНЫЕ НАБОРЫ" }
-      ]
-    },
-    { 
-      group: "ФУРНИТУРА", 
-      items: [
-        { name: "ФУРНИТУРА" }, { name: "ПОГОНЫ" }, { name: "ШЕВРОНЫ И ПАТЧИ" }, 
-        { name: "КОКАРДЫ" }, { name: "ЗНАЧКИ И МЕДАЛИ" }, { name: "ЗВЕЗДЫ И ЛЫЧКИ" }, 
-        { name: "АКСЕЛЬБАНТЫ" }, { name: "ПУГОВИЦЫ И ПРЯЖКИ" }, 
-        { name: "ЛИПУЧКИ И СТРОПЫ" }, { name: "ЗАЖИМЫ ДЛЯ ГАЛСТУКОВ" }
-      ]
-    },
-    { 
-      group: "СНАРЯЖЕНИЕ", 
-      items: [
-        { name: "РАЗГРУЗОЧНЫЕ СИСТЕМЫ" }, { name: "ПОЯСА И ПЛАТФОРМЫ" }, { name: "ПОДСУМКИ И ЧЕХЛЫ" }, 
-        { name: "КОБУРЫ" }, { name: "СУМКИ И РЮКЗАКИ" }, { name: "СПЕЦСРЕДСТВА" }, 
-        { name: "АПТЕЧКИ И МЕДИЦИНА" }, { name: "ТУРИЗМ И КЕМПИНГ" }, { name: "ФЛЯГИ И КОТЕЛКИ" }, 
-        { name: "ФОНАРИКИ" }, { name: "ИНСТРУМЕНТЫ" }, { name: "ЭЛЕКТРОНИКА И СВЯЗЬ" }
-      ]
-    },
-    { 
-      group: "СИЗ", 
-      items: [
-        { name: "ПЕРЧАТКИ" }, { name: "ТАКТИЧЕСКИЕ ПЕРЧАТКИ" }, { name: "ЗИМНИЕ ПЕРЧАТКИ И РУКАВИЦЫ" }, 
-        { name: "КАСКИ И ШЛЕМЫ" }, { name: "ОЧКИ" }, { name: "НАКОЛЕННИКИ И НАЛОКОТНИКИ" }
-      ]
-    },
-    { 
-      group: "ГОЛОВНЫЕ УБОРЫ", 
-      items: [
-        { name: "ШАПКИ" }, { name: "КЕПКИ" }, { name: "БЕСКОЗЫРКИ" }, { name: "БЕРЕТЫ" }, 
-        { name: "ФУРАЖКИ" }, { name: "АРАФАТКИ" }, { name: "ПИЛОТКИ" }, { name: "ПАНАМЫ" }, 
-        { name: "БАЛАКЛАВЫ (МАСКИ)" }, { name: "БАНДАНЫ И КОСЫНКИ" }, { name: "БАФФЫ" }, 
-        { name: "ШАРФЫ" }, { name: "ЧЕХЛЫ НА ГОЛОВНЫЕ УБОРЫ" }
-      ]
-    },
-    { 
-      group: "ОБУВЬ", 
-      items: [
-        { name: "БЕРЦЫ" }, { name: "БОТИНКИ" }, { name: "ГАЛОШИ" }, { name: "КЕДЫ" }, 
-        { name: "КРОССОВКИ" }, { name: "ПОЛУБОТИНКИ" }, { name: "САНДАЛИИ" }, { name: "САПОГИ" }, 
-        { name: "СТЕЛЬКИ" }, { name: "ТУФЛИ" }, { name: "УХОД ЗА ОБУВЬЮ" }, { name: "ШНУРКИ" }
-      ]
-    },
-    { 
-      group: "ОДЕЖДА", 
-      items: [
-        { name: "КОСТЮМЫ" }, { name: "КУРТКИ" }, { name: "БРЮКИ И ШОРТЫ" }, 
-        { name: "ЖИЛЕТЫ" }, { name: "МАЙКИ" }, { name: "ФУТБОЛКИ И ПОЛО" }, 
-        { name: "РУБАШКИ" }, { name: "НИЖНЕЕ БЕЛЬЕ" }, { name: "СВИТЕРЫ" }, { name: "ТЕРМОБЕЛЬЕ" }
-      ]
-    },
-    { 
-      group: "РЕМНИ", 
-      items: [
-        { name: "РЕМНИ" }, { name: "БЛЯХИ И ПРЯЖКИ" }, { name: "ШЛЕВКИ" }
-      ]
-    }
+    { group: "АКСЕССУАРЫ", items: [ { name: "ГАЛСТУКИ" }, { name: "ГОЙСЫ" }, { name: "МАНИШКИ" }, { name: "ПОДВОРОТНИЧКИ" }, { name: "ОБЛОЖКИ И КОРОЧКИ" }, { name: "БЕЙДЖИ И ШНУРЫ" }, { name: "ГАЛАНТЕРЕЯ" } ] },
+    { group: "СУВЕНИРЫ", items: [ { name: "ПОСУДА" }, { name: "ФЛАГИ И ВЫМПЕЛЫ" }, { name: "БРЕЛОКИ И МАГНИТЫ" }, { name: "ЧАСЫ" }, { name: "ПОДАРОЧНЫЕ НАБОРЫ" } ] },
+    { group: "ФУРНИТУРА", items: [ { name: "ФУРНИТУРА" }, { name: "ПОГОНЫ" }, { name: "ШЕВРОНЫ И ПАТЧИ" }, { name: "КОКАРДЫ" }, { name: "ЗНАЧКИ И МЕДАЛИ" }, { name: "ЗВЕЗДЫ И ЛЫЧКИ" }, { name: "АКСЕЛЬБАНТЫ" }, { name: "ПУГОВИЦЫ И ПРЯЖКИ" }, { name: "ЛИПУЧКИ И СТРОПЫ" }, { name: "ЗАЖИМЫ ДЛЯ ГАЛСТУКОВ" } ] },
+    { group: "СНАРЯЖЕНИЕ", items: [ { name: "РАЗГРУЗОЧНЫЕ СИСТЕМЫ" }, { name: "ПОЯСА И ПЛАТФОРМЫ" }, { name: "ПОДСУМКИ И ЧЕХЛЫ" }, { name: "КОБУРЫ" }, { name: "СУМКИ И РЮКЗАКИ" }, { name: "СПЕЦСРЕДСТВА" }, { name: "АПТЕЧКИ И МЕДИЦИНА" }, { name: "ТУРИЗМ И КЕМПИНГ" }, { name: "ФЛЯГИ И КОТЕЛКИ" }, { name: "ФОНАРИКИ" }, { name: "ИНСТРУМЕНТЫ" }, { name: "ЭЛЕКТРОНИКА И СВЯЗЬ" } ] },
+    { group: "СИЗ", items: [ { name: "ПЕРЧАТКИ" }, { name: "ТАКТИЧЕСКИЕ ПЕРЧАТКИ" }, { name: "ЗИМНИЕ ПЕРЧАТКИ И РУКАВИЦЫ" }, { name: "КАСКИ И ШЛЕМЫ" }, { name: "ОЧКИ" }, { name: "НАКОЛЕННИКИ И НАЛОКОТНИКИ" } ] },
+    { group: "ГОЛОВНЫЕ УБОРЫ", items: [ { name: "ШАПКИ" }, { name: "КЕПКИ" }, { name: "БЕСКОЗЫРКИ" }, { name: "БЕРЕТЫ" }, { name: "ФУРАЖКИ" }, { name: "АРАФАТКИ" }, { name: "ПИЛОТКИ" }, { name: "ПАНАМЫ" }, { name: "БАЛАКЛАВЫ (МАСКИ)" }, { name: "БАНДАНЫ И КОСЫНКИ" }, { name: "БАФФЫ" }, { name: "ШАРФЫ" }, { name: "ЧЕХЛЫ НА ГОЛОВНЫЕ УБОРЫ" } ] },
+    { group: "ОБУВЬ", items: [ { name: "БЕРЦЫ" }, { name: "БОТИНКИ" }, { name: "ГАЛОШИ" }, { name: "КЕДЫ" }, { name: "КРОССОВКИ" }, { name: "ПОЛУБОТИНКИ" }, { name: "САНДАЛИИ" }, { name: "САПОГИ" }, { name: "СТЕЛЬКИ" }, { name: "ТУФЛИ" }, { name: "УХОД ЗА ОБУВЬЮ" }, { name: "ШНУРКИ" } ] },
+    { group: "ОДЕЖДА", items: [ { name: "КОСТЮМЫ" }, { name: "КУРТКИ" }, { name: "БРЮКИ И ШОРТЫ" }, { name: "ЖИЛЕТЫ" }, { name: "МАЙКИ" }, { name: "ФУТБОЛКИ И ПОЛО" }, { name: "РУБАШКИ" }, { name: "НИЖНЕЕ БЕЛЬЕ" }, { name: "СВИТЕРЫ" }, { name: "ТЕРМОБЕЛЬЕ" } ] },
+    { group: "РЕМНИ", items: [ { name: "РЕМНИ" }, { name: "БЛЯХИ И ПРЯЖКИ" }, { name: "ШЛЕВКИ" } ] }
   ];
 
-  const LS_HISTORY = "sku.history.v4";
+  const LS_HISTORY = "sku.history.v5";
   const state = { history: readJSON(LS_HISTORY, []), lastBatch: [] };
 
-  function readJSON(key, fallback) {
-    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch (e) { return fallback; }
-  }
-  function writeJSON(key, value) {
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
-  }
+  function readJSON(key, fallback) { try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch (e) { return fallback; } }
+  function writeJSON(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} }
 
-  // --- ГЕНЕРАЦИЯ РАНДОМНОГО КОДА ---
   function generateRandomCode(length = 4) {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     let result = "";
-    for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+    for (let i = 0; i < length; i++) { result += chars.charAt(Math.floor(Math.random() * chars.length)); }
     return result;
   }
 
-  // --- ЛОГИКА SABER-TEX ---
-  function initSaberSelects() {
-    const fill = (id, data) => {
-      const el = document.getElementById(id); el.innerHTML = "";
+  // --- УМНЫЙ ВВОД ДЛЯ SABER-TEX ---
+  function initSaberInputs() {
+    const fillDatalist = (listId, data) => {
+      const dl = document.getElementById(listId);
+      dl.innerHTML = "";
       data.forEach(item => {
         const opt = document.createElement("option");
-        opt.value = item.code; opt.textContent = `${item.code} (${item.name})`;
-        el.appendChild(opt);
+        opt.value = item.code;
+        opt.textContent = `${item.code} - ${item.name}`; 
+        dl.appendChild(opt);
       });
     };
-    fill("saberType", SABER_DATA.types); fill("saberModel", SABER_DATA.models);
-    fill("saberSeason", SABER_DATA.seasons); fill("saberColor", SABER_DATA.colors);
-    fill("saberSize", SABER_DATA.sizes); fill("saberHeight", SABER_DATA.heights);
+    
+    fillDatalist("datalistType", SABER_DATA.types);
+    fillDatalist("datalistModel", SABER_DATA.models);
+    fillDatalist("datalistSeason", SABER_DATA.seasons);
+    fillDatalist("datalistColor", SABER_DATA.colors);
+    fillDatalist("datalistSize", SABER_DATA.sizes);
+    fillDatalist("datalistHeight", SABER_DATA.heights);
+    
+    document.getElementById("saberType").value = SABER_DATA.types[0].code;
+    document.getElementById("saberModel").value = SABER_DATA.models[0].code;
+    document.getElementById("saberSeason").value = SABER_DATA.seasons[0].code;
+    document.getElementById("saberColor").value = SABER_DATA.colors[0].code;
+    document.getElementById("saberSize").value = SABER_DATA.sizes[0].code;
+    document.getElementById("saberHeight").value = SABER_DATA.heights[0].code;
   }
 
   function generateSaber() {
-    const type = document.getElementById("saberType").value;
-    const model = document.getElementById("saberModel").value;
-    const season = document.getElementById("saberSeason").value;
-    const color = document.getElementById("saberColor").value;
-    const size = document.getElementById("saberSize").value;
-    const height = document.getElementById("saberHeight").value;
+    const getCleanCode = (id) => {
+      let val = document.getElementById(id).value;
+      if (val.includes(" ")) val = val.split(" ")[0];
+      return val.replace(/[^А-ЯЁA-Z0-9]/g, "").toUpperCase() || "XX";
+    };
+
+    const type = getCleanCode("saberType");
+    const model = getCleanCode("saberModel");
+    const season = getCleanCode("saberSeason");
+    const color = getCleanCode("saberColor");
+    const size = getCleanCode("saberSize");
+    const height = getCleanCode("saberHeight");
+    
     document.getElementById("saberResult").textContent = `${type}-${model}-${season}-${color}-${size}-${height}`;
   }
 
@@ -167,30 +116,19 @@
     if (cfg.useParent && cfg.group) parts.push(cleanToken(cfg.group, 6));
     parts.push(cleanToken(cfg.category, 10));
     if (cfg.brand) parts.push(cleanToken(cfg.brand, 4));
-    
     if (cfg.attrs.length) {
       const shortAttrs = cfg.attrs.slice(0, 2).map(a => cleanToken(a, 2)).filter(Boolean);
       if (shortAttrs.length) parts.push(shortAttrs.join(""));
     }
-
     let result = parts.join("-");
-    
-    // Умная обрезка до 25 символов
-    if (result.length > 25 && cfg.attrs.length && parts.length > 2) {
-      parts.pop(); // убираем атрибуты
-      result = parts.join("-");
-    }
+    if (result.length > 25 && cfg.attrs.length && parts.length > 2) { parts.pop(); result = parts.join("-"); }
     if (result.length > 25 && cfg.brand && parts.length > 2) {
       const brandClean = cleanToken(cfg.brand, 4);
       const idx = parts.indexOf(brandClean);
       if (idx !== -1) parts.splice(idx, 1);
       result = parts.join("-");
     }
-    
-    if (result.length > 25) {
-      result = result.slice(0, 25).replace(/-$/, ""); 
-    }
-    
+    if (result.length > 25) { result = result.slice(0, 25).replace(/-$/, ""); }
     return result;
   }
 
@@ -224,11 +162,11 @@
   function persistSettings() {
     const data = {};
     for (const f of FIELDS) { const el = $(f); if (el) data[f] = el.type === "checkbox" ? el.checked : el.value; }
-    data["categorySelect"] = $("categorySelect").value; writeJSON("sku.settings.v4", data);
+    data["categorySelect"] = $("categorySelect").value; writeJSON("sku.settings.v5", data);
   }
 
   function restoreSettings() {
-    const data = readJSON("sku.settings.v4", null); if (!data) return;
+    const data = readJSON("sku.settings.v5", null); if (!data) return;
     for (const f of FIELDS) {
       const el = $(f);
       if (data[f] !== undefined && el) { if (el.type === "checkbox") el.checked = data[f]; else el.value = data[f]; }
@@ -246,16 +184,13 @@
     const cfg = readForm();
     const rows = [];
     const now = new Date().toLocaleString("ru-RU");
-
     for (let i = 0; i < cfg.qty; i++) {
       cfg.brand = generateRandomCode(4);
       const sku = buildSku(cfg);
       rows.push({ sku, len: sku.length });
       state.history.unshift({ sku, date: now });
     }
-
     if (state.history.length > 500) state.history = state.history.slice(0, 500);
-    
     writeJSON(LS_HISTORY, state.history);
     $("brand").value = generateRandomCode(4);
     state.lastBatch = rows; 
@@ -333,7 +268,9 @@
 
   $("btnGenSaber").addEventListener("click", generateSaber);
   $("btnCopySaber").addEventListener("click", (e) => copyText($("saberResult").textContent, e.target));
+  
   ["saberType", "saberModel", "saberSeason", "saberColor", "saberSize", "saberHeight"].forEach(id => {
+    $(id).addEventListener("input", generateSaber);
     $(id).addEventListener("change", generateSaber);
   });
 
@@ -353,13 +290,5 @@
   $("categorySelect").addEventListener("change", persistSettings);
 
   // --- ИНИЦИАЛИЗАЦИЯ ---
-  initSaberSelects(); generateSaber(); initCategorySelect(); restoreSettings(); renderHistory();
-
-    // Регистрация Service Worker для работы офлайн
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error', err));
-    });
-  }
-  
+  initSaberInputs(); generateSaber(); initCategorySelect(); restoreSettings(); renderHistory();
 })();
