@@ -26,7 +26,7 @@
 
   // --- СПРАВОЧНИКИ SABER-TEX ---
   const SABER_DATA = {
-    types: [{ code: "БР", name: "Брюки" }, { code: "БРЮ", name: "Брюки (альт)" }, { code: "КОС", name: "Костюм" }, { code: "КУР", name: "Куртка" }, { code: "ФУТ", name: "Футболка" }],
+    types: [{ code: "БР", name: "Брюки" }, { code: "ШРТ", name: "Шорты" }, { code: "КОС", name: "Костюм" }, { code: "КУР", name: "Куртка" }, { code: "ФУТ", name: "Футболка" }],
     models: [{ code: "БРК", name: "Беркут-К" }, { code: "ГВР", name: "Гвардия" }],
     seasons: [{ code: "ЛТ", name: "Лето" }, { code: "ДМ", name: "Демисезонное" }, { code: "ЗМ", name: "Зима" }, { code: "ВС", name: "Внесезонное" }],
     colors: [{ code: "001", name: "Черный" }, { code: "002", name: "Белый" }, { code: "003", name: "X" }, { code: "004", name: "X" }, { code: "005", name: "X" }, { code: "006", name: "X" }],
